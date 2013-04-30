@@ -559,3 +559,27 @@ Scene.prototype.keyboard = function(e) {
         }
     }
 }
+
+Scene.prototype.deleteSelection = function() {
+    if (mode != mode_edit) {
+        return;
+    }
+    
+    importPackage(Packages.kidscoach);
+    
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].selection) {
+            this.oarr[i].removeNode();
+            Project.getProject().deleteElement(this.oarr[i].id);
+            this.oarr.splice (i, i);
+        }
+    }
+    
+    for (i = 0; i < this.parr.length; i++) {
+        if (this.parr[i].selection) {
+            this.parr[i].removeNode();
+            Project.getProject().deleteElement(this.parr[i].id);            
+            this.parr.splice (i, i);
+        }       
+    }
+}

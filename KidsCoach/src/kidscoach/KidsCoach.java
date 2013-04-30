@@ -55,7 +55,7 @@ public class KidsCoach extends JFrame implements ActionListener {
         if ("Select".equals(e.getActionCommand())) {
             prj.selectToolEnable();
         } else if ("Delete".equals(e.getActionCommand())) {
-            prj.deleteToolEnable();
+            prj.deleteSelection();
         } else if ("Start".equals(e.getActionCommand())) {
             prj.showModeEnable();
             setTitle("Обучение в играх (игра)");

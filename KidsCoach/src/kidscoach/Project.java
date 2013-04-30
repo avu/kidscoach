@@ -134,6 +134,11 @@ public class Project implements DropTargetListener {
     void changeColor(String rgb) {
         canvas.executeScript("change_color(\"" + rgb + "\")");        
     }
+    
+    void deleteSelection() {
+        canvas.executeScript("delete_selection()");        
+    }
+    
     private void createLine(int pid, float x1, float y1, float x2, float y2,
                             float w, String color) 
     {
@@ -1229,6 +1234,22 @@ public class Project implements DropTargetListener {
         return null;
    }
    
+   public Element lookupElement(Node root, int id) 
+   {
+       for (Node obj = root.getFirstChild(); obj != null; 
+           obj = obj.getNextSibling()) 
+        {
+            if (obj instanceof Element)  {
+                Element el = (Element)obj;
+                if (el.getAttribute("id").equals(Integer.toString(id))) 
+                {
+                    return el;
+                }
+            }
+        }
+        return null;
+   }
+   
    public int changeText(String id, float x, float y, String txt, String size, 
                          String color) 
    {
@@ -1456,6 +1477,24 @@ public class Project implements DropTargetListener {
 
                     objsEl.appendChild(sobj);
                 }
+            }
+        }
+    }
+    
+    public void deleteElement(String id) {
+        Element slide = getSlide(curSlideId);
+        Element shapes = lookupElement(slide, "shapes");
+        if (shapes != null) {
+            Element e = lookupElement(shapes, Integer.parseInt(id));
+            if (e != null) {
+                e.getParentNode().removeChild(e);
+            }
+        }
+        Element objs = lookupElement(slide, "objects");
+        if (objs != null) {
+            Element e = lookupElement(objs, Integer.parseInt(id));
+            if (e != null) {
+                e.getParentNode().removeChild(e);
             }
         }
     }

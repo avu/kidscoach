@@ -37,7 +37,11 @@ function init() {
 function clear_scene() {
     scn.clearScene();
 }
-    
+
+function delete_selection() {
+    scn.deleteSelection();
+}
+
 function bind_target(tid, oid) {
     scn.bindTarget(tid,oid);
 }

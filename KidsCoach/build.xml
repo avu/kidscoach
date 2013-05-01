@@ -71,4 +71,22 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-jar">
+        <delete dir="deploy"/>
+        <mkdir dir="deploy"/>
+        <mkdir dir="deploy/lib"/>
+        <copy todir="deploy/lib">
+            <fileset dir="dist/lib"/>
+        </copy>
+        <unzip src="dist/KidsCoach.jar"
+               dest="deploy">
+            <patternset>
+                <exclude name="META-INF/**"/>
+            </patternset>
+        </unzip>
+        <copy file="run.cmd" todir="deploy"/>
+        <copy file="run.sh" todir="deploy"/>
+        <chmod file="deploy/run.cmd" perm="+rx"/>
+        <chmod file="deploy/run.sh" perm="+rx"/>
+    </target>
 </project>

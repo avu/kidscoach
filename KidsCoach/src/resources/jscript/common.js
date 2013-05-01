@@ -4,6 +4,10 @@ var cover_prec = 10;
 var default_text_size = "100";
 var default_line_width = "1";
 var default_prim_color = "#000000";
+var ascii_esc = 27;
+var ascii_enter = 10;
+var ascii_delete = 127;
+var ascii_backspace = 8;
 
 // Following is from Holger Will since ASV3 and O9 do not support getScreenTCM()
 // See http://groups.yahoo.com/group/svg-developers/message/50789

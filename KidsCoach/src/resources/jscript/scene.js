@@ -530,22 +530,24 @@ Scene.prototype.commitPrim = function() {
 }
 
 Scene.prototype.keyboard = function(e) {
-    if (e.charCode == 27) {
+    if (e.charCode == ascii_esc) {
         if (this.constrPrim) {
             this.constrPrim.removeNode();
             this.constrPrim = null;
         }
-    } else if (e.charCode == 10) {
+    } else if (e.charCode == ascii_enter) {
         this.commitPrim();
-    } else if (e.charCode == 8 || e.charCode == 127) {
+    } else if (e.charCode == ascii_backspace || e.charCode == ascii_delete) {
         if (this.constrPrim) {
             if (this.constrPrim.prims[0] == "text") {
                 var s = this.constrPrim.data[0];
                 if (s.length > 0) {
                     this.constrPrim.data[0] = s.slice(0,s.length - 1);
                     this.constrPrim.updateNode();
-                 }    
+                }    
             }
+        } else {
+            this.deleteSelection();            
         }
     } else if (e.charCode != 65535) {
         var letter = String.fromCharCode(e.charCode);

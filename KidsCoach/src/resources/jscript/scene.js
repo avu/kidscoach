@@ -125,8 +125,10 @@ Scene.prototype.pressObject = function (evt) {
     }
     if (!this.draggingObject) return;
         
-    if (tool == tool_delete && mode == mode_edit) {
-        this.draggingObject.removeNode();
+    if (mode == mode_edit && evt.button == 2) {
+        importPackage(Packages.kidscoach);
+        Project.getProject().popupMenu(
+            evt.clientX, evt.clientY, "редактирование");
     } else {
         var p = document.documentElement.createSVGPoint();
         p.x = evt.clientX;
@@ -560,7 +562,7 @@ Scene.prototype.keyboard = function(e) {
             this.constrPrim.updateNode();
         }
     }
-}
+};
 
 Scene.prototype.deleteSelection = function() {
     if (mode != mode_edit) {
@@ -568,20 +570,32 @@ Scene.prototype.deleteSelection = function() {
     }
     
     importPackage(Packages.kidscoach);
+    var r = [];
     
     for (var i = 0; i < this.oarr.length; i++) {
         if (this.oarr[i].selection) {
-            this.oarr[i].removeNode();
-            Project.getProject().deleteElement(this.oarr[i].id);
-            this.oarr.splice (i, i);
+            r.push(i);
         }
     }
+      
+    var q = [];
     
     for (i = 0; i < this.parr.length; i++) {
         if (this.parr[i].selection) {
-            this.parr[i].removeNode();
-            Project.getProject().deleteElement(this.parr[i].id);            
-            this.parr.splice (i, i);
+            q.push(i);
         }       
     }
-}
+
+    this.deselect();
+    for (i = r.length - 1; i >= 0; i--) {
+        this.oarr[r[i]].removeNode();
+        Project.getProject().deleteElement(this.oarr[r[i]].id);
+        this.oarr.splice (r[i], r[i]);
+    }
+
+    for (i = q.length - 1; i >= 0; i--) {
+        this.parr[q[i]].removeNode();
+        Project.getProject().deleteElement(this.parr[q[i]].id);            
+        this.parr.splice (q[i], q[i]);
+    }
+};

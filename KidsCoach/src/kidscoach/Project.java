@@ -9,6 +9,7 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -31,6 +32,8 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -59,7 +62,7 @@ import org.xml.sax.SAXException;
  *
  * @author avu
  */
-public class Project implements DropTargetListener {
+public class Project implements DropTargetListener, ActionListener {
     private static final Logger log = Logger.getLogger(Project.class.getName());
     public static final String DEFAULT_NAME = "noname.zip";
     private static Project sharedProject;
@@ -72,6 +75,7 @@ public class Project implements DropTargetListener {
     }
     
     SCanvas canvas;
+    JPopupMenu objectEditPopup;
     ResourcePanel resourcePanel;
     SlidePanel slidePanel;
     Document prj;
@@ -171,6 +175,13 @@ public class Project implements DropTargetListener {
                              ",\"" + txt + "\",\""  + size +  "\",\"" + color + "\")");
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if ("Delete".equals(e.getActionCommand())) {
+            deleteSelection();
+        }
+    }
+
     static class SceneElem {
         String id;
         public SceneElem(String id) {
@@ -210,6 +221,18 @@ public class Project implements DropTargetListener {
         }
         return canvas;
     }
+    
+    final JPopupMenu getObjectEditPopup() {
+        if (objectEditPopup == null) {
+            objectEditPopup = new JPopupMenu();
+            JMenuItem item = new JMenuItem("Удалить");
+            item.addActionListener(this);
+            item.setActionCommand("Delete");
+            objectEditPopup.add(item);
+        }
+        return objectEditPopup;
+    }
+
     
     final SlidePanel getSlidePanel() {
         if (slidePanel == null) {
@@ -1497,5 +1520,9 @@ public class Project implements DropTargetListener {
                 e.getParentNode().removeChild(e);
             }
         }
+    }
+    
+    public void popupMenu(int x, int y, String descr) {
+        getObjectEditPopup().show(getCanvas(), x, y);
     }
 }

@@ -67,7 +67,7 @@ TextPrim.prototype.setHeight = function(h) {
 TextPrim.prototype.select = function() {
     if (!this.selection && this.node) {
         importPackage(Packages.kidscoach);
-        Project.getProject().selectObject("shapes", "text", this.id);
+        Project.getProject().selectObject("objects", "text", this.id);
 
         this.selection = document.createElementNS(svgNS,"g");
         this.showControlPoints(this.selection);

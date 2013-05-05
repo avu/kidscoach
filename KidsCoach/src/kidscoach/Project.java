@@ -392,8 +392,6 @@ public class Project implements DropTargetListener, ActionListener {
                     sobj.appendChild(objs);
                     Element targs = prj.createElement("targets");
                     sobj.appendChild(targs);
-                    Element shapes = prj.createElement("shapes");
-                    sobj.appendChild(shapes);
 
                     String emptySlidePath = null;
                     try {
@@ -466,7 +464,7 @@ public class Project implements DropTargetListener, ActionListener {
                             }
                         }
                     }                            
-                } else if (objsEl.getTagName().equals("shapes")) {
+                } else if (objsEl.getTagName().equals("objects")) {
                     for (Node n = objsEl.getFirstChild(); n != null; 
                         n = n.getNextSibling()) 
                     {
@@ -534,45 +532,27 @@ public class Project implements DropTargetListener, ActionListener {
                                 final String s = pobj.getAttribute("size");                                
                                 String c = pobj.getAttribute("color");
                                 createText(pid, x, y, text, s, c);
+                            } else if (pobj.getTagName().equals("object")) {
+                                final int id = 
+                                    Integer.parseInt(pobj.getAttribute("id"));
+                                final String str = 
+                                    pobj.getAttribute("name");
+                                final float x = 
+                                    Float.parseFloat(pobj.getAttribute("x"));
+                                final float y = 
+                                    Float.parseFloat(pobj.getAttribute("y"));
+                                final float w = 
+                                    Float.parseFloat(pobj.getAttribute("w"));
+                                final float h = 
+                                    Float.parseFloat(pobj.getAttribute("h"));
+
+                                canvas.addSVGFile(id, str, x, y, w, h);
+                            } else if (objsEl.getTagName().equals("count")) {
+                                objCount = Integer.parseInt(objsEl.getAttribute("value"));
                             }
                         }
                     }
                 }
-            }
-        }
-        
-        for (Node obj = slide.getFirstChild(); obj != null; 
-             obj = obj.getNextSibling()) 
-        {
-            if (obj instanceof Element)  {
-                Element objsEl = (Element)obj;
-                if (objsEl.getTagName().equals("objects")) {
-                    for (Node n = objsEl.getFirstChild(); n != null; 
-                        n = n.getNextSibling()) 
-                    {
-                        if (n instanceof Element) {
-                            Element sobj = (Element)n;
-                            if (sobj.getTagName().equals("object")) {
-                                final int id = 
-                                    Integer.parseInt(sobj.getAttribute("id"));
-                                final String str = 
-                                    sobj.getAttribute("name");
-                                final float x = 
-                                    Float.parseFloat(sobj.getAttribute("x"));
-                                final float y = 
-                                    Float.parseFloat(sobj.getAttribute("y"));
-                                final float w = 
-                                    Float.parseFloat(sobj.getAttribute("w"));
-                                final float h = 
-                                    Float.parseFloat(sobj.getAttribute("h"));
-
-                                canvas.addSVGFile(id, str, x, y, w, h);
-                            }
-                        }
-                    }
-                } else if (objsEl.getTagName().equals("count")) {
-                    objCount = Integer.parseInt(objsEl.getAttribute("value"));
-                } 
             }
         }
     }
@@ -1112,7 +1092,7 @@ public class Project implements DropTargetListener, ActionListener {
       {
           if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   Element sobj = prj.createElement("line");
                   sobj.setAttribute("id", Integer.toString(objCount));
                   sobj.setAttribute("x1", Float.toString(x0));
@@ -1139,7 +1119,7 @@ public class Project implements DropTargetListener, ActionListener {
       {
           if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   Element sobj = prj.createElement("ellipse");
                   sobj.setAttribute("id", Integer.toString(objCount));
                   sobj.setAttribute("cx", Float.toString(cx));
@@ -1167,7 +1147,7 @@ public class Project implements DropTargetListener, ActionListener {
       {
           if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   Element sobj = prj.createElement("rect");
                   sobj.setAttribute("id", Integer.toString(objCount));
                   sobj.setAttribute("x", Float.toString(x));
@@ -1193,7 +1173,7 @@ public class Project implements DropTargetListener, ActionListener {
       {
           if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   Element sobj = prj.createElement("text");
                   sobj.setAttribute("id", Integer.toString(objCount));
                   sobj.setAttribute("x", Float.toString(x));
@@ -1219,7 +1199,7 @@ public class Project implements DropTargetListener, ActionListener {
       {
           if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   Element sobj = prj.createElement("path");
                   sobj.setAttributeNS(null, "id", Integer.toString(objCount));
                   
@@ -1288,9 +1268,9 @@ public class Project implements DropTargetListener, ActionListener {
    {
        Element slide = getSlide(curSlideId);
 
-       Element shapes = lookupElement(slide, "shapes");
-       if (shapes != null) {
-           Element text = lookupElement(shapes, "text", id);
+       Element objects = lookupElement(slide, "objects");
+       if (objects != null) {
+           Element text = lookupElement(objects, "text", id);
            text.setAttribute("x", Float.toString(x));
            text.setAttribute("y", Float.toString(y));
            text.setAttribute("text", txt);
@@ -1309,7 +1289,7 @@ public class Project implements DropTargetListener, ActionListener {
         {
             if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   for (Node n = objsEl.getFirstChild(); n != null; 
                          n = n.getNextSibling()) 
                     {
@@ -1334,11 +1314,11 @@ public class Project implements DropTargetListener, ActionListener {
    public int selectObject(String container, String name, String id) 
    {
        Element slide = getSlide(curSlideId);
-       Element shapes = lookupElement(slide, container);
-       if (shapes != null) {
-           Element gobj = lookupElement(shapes, name, id);
-           shapes.removeChild(gobj);
-           shapes.appendChild(gobj);
+       Element objects = lookupElement(slide, container);
+       if (objects != null) {
+           Element gobj = lookupElement(objects, name, id);
+           objects.removeChild(gobj);
+           objects.appendChild(gobj);
        }
        return 0;
    }
@@ -1353,7 +1333,7 @@ public class Project implements DropTargetListener, ActionListener {
         {
             if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   for (Node n = objsEl.getFirstChild(); n != null; 
                          n = n.getNextSibling()) 
                     {
@@ -1386,7 +1366,7 @@ public class Project implements DropTargetListener, ActionListener {
         {
             if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   for (Node n = objsEl.getFirstChild(); n != null; 
                          n = n.getNextSibling()) 
                     {
@@ -1415,7 +1395,7 @@ public class Project implements DropTargetListener, ActionListener {
         {
             if (obj instanceof Element)  {
               Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("shapes")) {
+              if (objsEl.getTagName().equals("objects")) {
                   for (Node n = objsEl.getFirstChild(); n != null; 
                          n = n.getNextSibling()) 
                     {
@@ -1516,13 +1496,7 @@ public class Project implements DropTargetListener, ActionListener {
     
     public void deleteElement(String id) {
         Element slide = getSlide(curSlideId);
-        Element shapes = lookupElement(slide, "shapes");
-        if (shapes != null) {
-            Element e = lookupElement(shapes, Integer.parseInt(id));
-            if (e != null) {
-                e.getParentNode().removeChild(e);
-            }
-        }
+      
         Element objs = lookupElement(slide, "objects");
         if (objs != null) {
             Element e = lookupElement(objs, Integer.parseInt(id));

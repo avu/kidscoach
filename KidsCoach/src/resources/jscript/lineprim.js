@@ -83,7 +83,7 @@ LinePrim.prototype.setHeight = function(h) {
 LinePrim.prototype.select = function() {
     if (!this.selection && this.node) {
         importPackage(Packages.kidscoach);
-        Project.getProject().selectObject("shapes", "line", this.id);
+        Project.getProject().selectObject("objects", "line", this.id);
         this.selection = document.createElementNS(svgNS,"g");
         this.showControlPoints(this.selection);
         this.node.appendChild(this.selection);

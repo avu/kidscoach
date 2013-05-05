@@ -82,7 +82,7 @@ PathPrim.prototype.setHeight = function(h) {
 PathPrim.prototype.select = function() {
     if (!this.selection && this.node) {
         importPackage(Packages.kidscoach);
-        Project.getProject().selectObject("shapes", "path", this.id);
+        Project.getProject().selectObject("objects", "path", this.id);
         this.selection = document.createElementNS(svgNS,"g");
         this.showControlPoints(this.selection);
         this.node.appendChild(this.selection);

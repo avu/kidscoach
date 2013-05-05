@@ -86,7 +86,7 @@ RectPrim.prototype.setHeight = function(h) {
 RectPrim.prototype.select = function() {
     if (!this.selection && this.node) {
         importPackage(Packages.kidscoach);
-        Project.getProject().selectObject("shapes", "rect", this.id);
+        Project.getProject().selectObject("objects", "rect", this.id);
         this.selection = document.createElementNS(svgNS,"g");
         this.showControlPoints(this.selection);
         this.node.appendChild(this.selection);

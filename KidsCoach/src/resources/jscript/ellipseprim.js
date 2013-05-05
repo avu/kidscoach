@@ -86,7 +86,7 @@ EllipsePrim.prototype.setHeight = function(h) {
 EllipsePrim.prototype.select = function() {
     if (!this.selection && this.node) {
         importPackage(Packages.kidscoach);
-        Project.getProject().selectObject("shapes", "ellipse", this.id);
+        Project.getProject().selectObject("objects", "ellipse", this.id);
         this.selection = document.createElementNS(svgNS,"g");
         this.showControlPoints(this.selection);
         this.node.appendChild(this.selection);

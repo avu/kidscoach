@@ -134,7 +134,7 @@ function mouseDownScene(evt) {
     p = p.matrixTransform(m.inverse());
              
     importPackage(Packages.kidscoach);
-    if(mode == mode_edit && sobj && sobj.type == gobj_type_image && tool == tool_select)
+    if(mode == mode_edit && sobj && tool == tool_select)
     {    
         var targ = scn.getTargetForObject(sobj.id);
         if (targ) {
@@ -262,9 +262,13 @@ function mouseMove(evt) {
             }
         }
         importPackage(Packages.kidscoach);
+        
+        drobj.ex = ex;
+        drobj.ey = ey;
+
         if (drobj.type == gobj_type_image) {
-            drobj.ex = ex + drobj.getWidth()/2.0;
-            drobj.ey = ey + drobj.getHeight()/2.0;
+            drobj.ex += drobj.getWidth()/2.0;
+            drobj.ey += drobj.getHeight()/2.0;
             Project.getProject().changeObject(drobj.id, 
                 ex+drobj.getWidth()/2.0, ey+drobj.getHeight()/2.0, 
                 drobj.getWidth(), drobj.getHeight());

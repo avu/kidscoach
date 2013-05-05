@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -261,8 +262,9 @@ public class KidsCoach extends JFrame implements ActionListener {
         toolPane.add(animBar, BorderLayout.WEST);
         toolPane.add(primBar, BorderLayout.WEST);
         //toolPane.add(rmodeBar, BorderLayout.WEST);
-        
         getContentPane().add(toolPane, BorderLayout.NORTH);
+        getContentPane().add(prj.getStatusLine(), BorderLayout.SOUTH);
+
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, 
             prj.getCanvas(), prj.getResourcePanel());

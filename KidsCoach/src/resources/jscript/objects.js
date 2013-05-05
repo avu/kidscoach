@@ -17,38 +17,38 @@ function GObj (type) {
 GObj.prototype.getX = function () {
     alert("Calling getX from abstract object");
     return 0;
-}
+};
 
 GObj.prototype.getY = function () {
     alert("Calling getY from abstract object");
     return 0;
-}
+};
 
 GObj.prototype.setX = function (x) {
     alert("Calling setX from abstract object");
-}
+};
 
 GObj.prototype.setY = function (y) {
     alert("Calling setY from abstract object");
-}
+};
 
 GObj.prototype.getWidth = function () {
     alert("Calling getWidth from abstract object");
     return 0;
-}
+};
 
 GObj.prototype.getHeight = function () {
     alert("Calling getHeight from abstract object");
     return 0;
-}
+};
 
 GObj.prototype.setWidth = function (w) {
     alert("Calling setWidth from abstract object");
-}
+};
 
 GObj.prototype.setHeight = function (h) {
     alert("Calling setHeight from abstract object");
-}
+};
 
 GObj.prototype.select = function() {
     if (!this.selection && this.node) {
@@ -85,7 +85,7 @@ GObj.prototype.select = function() {
             this.node.appendChild(this.resizeNode);
         }
     }
-}
+};
 
 GObj.prototype.resize = function(curW, curH, dw, dh) {
     this.setWidth(curW + dw);
@@ -95,7 +95,7 @@ GObj.prototype.resize = function(curW, curH, dw, dh) {
         this.deselect();
         this.select();
     }
-}
+};
 
 GObj.prototype.deselect = function() {
     if (this.selection) {
@@ -107,23 +107,23 @@ GObj.prototype.deselect = function() {
         this.resizeNode.parentNode.removeChild(this.resizeNode);
         this.resizeNode = null;
     }
-}
+};
 
 GObj.prototype.createNode = function() {
     alert("Cannot create abstract node");
-}
+};
     
 GObj.prototype.removeNode = function() {
     if (this.node) {
         this.node.parentNode.removeChild(this.node);
         this.node = null;
     }
-}
+};
 
 GObj.prototype.updateNode = function() {
     this.removeNode();
     this.createNode();
-}
+};
 
 GObj.prototype.addDragProp = function(grp) {
     grp.setAttributeNS(null, "transform", "translate(" + this.getX() + "," + 
@@ -134,7 +134,7 @@ GObj.prototype.addDragProp = function(grp) {
     grp.setAttributeNS(null, "dragx", "" + this.getX());
     grp.setAttributeNS(null, "dragy", "" + this.getY());
     grp.setAttributeNS(null, "onmousedown", "mouseDown(evt)");
-}
+};
 
 function Target (tid, x, y, w, h) {
     this.id = tid;
@@ -163,27 +163,27 @@ SObj.prototype = Object.create(GObj.prototype);
 
 SObj.prototype.getX = function() {
     return this.x;
-}
+};
 
 SObj.prototype.getY = function() {
     return this.y;
-}
+};
 
 SObj.prototype.setX = function(x) {
     this.x = x;
-}
+};
 
 SObj.prototype.setY = function(y) {
     this.y = y;
-}
+};
 
 SObj.prototype.getWidth = function() {
     return this.w;
-}
+};
 
 SObj.prototype.getHeight = function() {
     return this.h;
-}
+};
 
 SObj.prototype.setWidth = function(w) {
     this.w = w;
@@ -214,6 +214,8 @@ function SPrim (pid, type, x, y, coords, prims, data) {
     this.data = data;
     this.node = null;
     this.editMode = false;
+    this.ex = x;
+    this.ey = y;
     this.x = x;
     this.y = y;
 }

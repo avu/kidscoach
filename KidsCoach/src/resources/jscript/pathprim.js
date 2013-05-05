@@ -3,6 +3,10 @@ var gobj_type_path = "path";
 
 function PathPrim (pid, x, y, coords, color) {
     SPrim.call(this, pid, gobj_type_path, x, y, coords, ["path"], [color]);
+    this.x0 = 0;
+    this.y0 = 0;
+    this.x1 = 0;
+    this.y1 = 0;
 }
 
 PathPrim.prototype = Object.create(SPrim.prototype);
@@ -33,7 +37,7 @@ PathPrim.prototype.createNode = function() {
     
     svgRoot.appendChild(grp);
     this.node = grp;
-}
+};
 
 PathPrim.prototype.showControlPoints = function(grp) {
     for (var i = 0; i < this.coords.length; i+=2) {
@@ -41,37 +45,37 @@ PathPrim.prototype.showControlPoints = function(grp) {
             this.coords[i + 1]);
         cp.setAttributeNS(null, "onmousedown", "mouseDownCP(evt," + i + ")");    
     }
-}
+};
 
 PathPrim.prototype.getX = function() {
     return this.x;
-}
+};
 
 PathPrim.prototype.getY = function() {
     return this.y;
-}
+};
 
 PathPrim.prototype.setX = function(x) {
     this.x = x;
-}
+};
 
 PathPrim.prototype.setY = function(y) {
     this.y = y;
-}
+};
 
 PathPrim.prototype.getWidth = function() {
     return 0;
-}
+};
 
 PathPrim.prototype.getHeight = function() {
     return 0;
-}
+};
 
 PathPrim.prototype.setWidth = function(w) {
-}
+};
 
 PathPrim.prototype.setHeight = function(h) {
-}
+};
 
 PathPrim.prototype.select = function() {
     if (!this.selection && this.node) {
@@ -81,4 +85,26 @@ PathPrim.prototype.select = function() {
         this.showControlPoints(this.selection);
         this.node.appendChild(this.selection);
     }
-}
+};
+
+PathPrim.prototype.addControlPoint = function(grp, x, y) {
+    var c = document.createElementNS(svgNS, "circle");
+    c.setAttributeNS(null,"cx",x);
+    c.setAttributeNS(null,"cy",y);
+    c.setAttributeNS(null,"r",5);
+    c.setAttributeNS(null,"style", "stroke:rgb(0,0,0);stroke-width:2;fill:red");
+    grp.appendChild(c);
+    if (x < this.x0) this.x0 = x;
+    if (y < this.y0) this.y0 = y;
+    if (x > this.x1) this.x1 = x;
+    if (y > this.y1) this.y1 = y;
+    return c;
+};
+
+PathPrim.prototype.cover = function (targ) {
+    show_status("this.x=" + this.x0);
+    return Math.abs(this.x + (this.x0 + this.x1)*0.5 - 
+                    targ.x - targ.w*0.5) < cover_prec &&
+           Math.abs(this.y + (this.y0 + this.y1)*0.5 -
+                    targ.y - targ.h*0.5) < cover_prec;
+};

@@ -36,7 +36,7 @@ LinePrim.prototype.createNode = function() {
     
     svgRoot.appendChild(grp);
     this.node = grp;
-}
+};
 
 LinePrim.prototype.showControlPoints = function(grp) {    
     var cp = this.addControlPoint(grp, this.coords[0], 
@@ -44,39 +44,39 @@ LinePrim.prototype.showControlPoints = function(grp) {
     cp.setAttributeNS(null, "onmousedown", "mouseDownCP(evt,0)");    
     cp = this.addControlPoint(grp, this.coords[2], this.coords[3]);
     cp.setAttributeNS(null, "onmousedown", "mouseDownCP(evt,2)");
-}
+};
 
 LinePrim.prototype.getX = function() {
     return this.x;
-}
+};
 
 LinePrim.prototype.getY = function() {
     return this.y;
-}
+};
 
 LinePrim.prototype.setX = function(x) {
     this.x = x;
-}
+};
 
 LinePrim.prototype.setY = function(y) {
     this.y = y;
-}
+};
 
 LinePrim.prototype.getWidth = function() {
     return this.coords[2];
-}
+};
 
 LinePrim.prototype.getHeight = function() {
     return this.coords[3];
-}
+};
 
 LinePrim.prototype.setWidth = function(w) {
     this.coords[2] = w;
-}
+};
 
 LinePrim.prototype.setHeight = function(h) {
     this.coords[3] = h;
-}
+};
 
 LinePrim.prototype.select = function() {
     if (!this.selection && this.node) {
@@ -86,4 +86,11 @@ LinePrim.prototype.select = function() {
         this.showControlPoints(this.selection);
         this.node.appendChild(this.selection);
     }
-}
+};
+
+LinePrim.prototype.cover = function (targ) {
+    return Math.abs(this.x + (this.coords[0] + this.coords[2])*0.5 - 
+            targ.x - targ.w*0.5) < cover_prec &&
+           Math.abs(this.y + (this.coords[1] + this.coords[3])*0.5 -
+            targ.y - targ.h*0.5) < cover_prec;
+};

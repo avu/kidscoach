@@ -26,7 +26,7 @@ EllipsePrim.prototype.createNode = function() {
     
     svgRoot.appendChild(grp);
     this.node = grp;
-}
+};
 
 EllipsePrim.prototype.showControlPoints = function(grp) {
     var p = document.createElementNS(svgNS, "rect");
@@ -47,39 +47,39 @@ EllipsePrim.prototype.showControlPoints = function(grp) {
     var dragCP = this.addControlPoint(grp, this.coords[0] + this.coords[2], 
         this.coords[1] + this.coords[3]);
     dragCP.setAttributeNS(null, "onmousedown", "mouseDownResize(evt)");
-}
+};
 
 EllipsePrim.prototype.getX = function() {
     return this.x;
-}
+};
 
 EllipsePrim.prototype.getY = function() {
     return this.y;
-}
+};
 
 EllipsePrim.prototype.setX = function(x) {
     this.x = x;
-}
+};
 
 EllipsePrim.prototype.setY = function(y) {
     this.y = y;
-}
+};
 
 EllipsePrim.prototype.getWidth = function() {
     return this.coords[2];
-}
+};
 
 EllipsePrim.prototype.getHeight = function() {
     return this.coords[3];
-}
+};
 
 EllipsePrim.prototype.setWidth = function(w) {
     this.coords[2] = w;
-}
+};
 
 EllipsePrim.prototype.setHeight = function(h) {
     this.coords[3] = h;
-}
+};
 
 EllipsePrim.prototype.select = function() {
     if (!this.selection && this.node) {
@@ -89,4 +89,9 @@ EllipsePrim.prototype.select = function() {
         this.showControlPoints(this.selection);
         this.node.appendChild(this.selection);
     }
-}
+};
+
+EllipsePrim.prototype.cover = function (targ) {
+    return Math.abs(this.x - targ.x - targ.w*0.5) < cover_prec &&
+    Math.abs(this.y - targ.y - targ.h*0.5) < cover_prec;
+};

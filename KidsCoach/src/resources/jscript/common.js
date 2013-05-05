@@ -118,6 +118,11 @@ function getScreenCTM(doc){
     return sCTM
 }
 
+function show_status(str) {
+    importPackage(Packages.kidscoach);
+    Project.getProject().showStatus(str);
+}
+
 if (!Object.create) {
     Object.create = function (o) {
         if (arguments.length > 1) {

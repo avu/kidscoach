@@ -2,7 +2,6 @@ function Scene() {
     this.tarr = new Array();
     this.oarr = new Array();
     this.barr = new Array();
-    this.parr = new Array();
     this.draggingObject = null;
     this.selectedObject = null;
     this.isResize = false;
@@ -53,47 +52,43 @@ Scene.prototype.addObject = function (oid, name, x, y, w, h) {
 Scene.prototype.createRect = function (pid, x0, y0, w, h, color) {
     var p = new RectPrim(pid, x0, y0, w, h, color);
     p.createNode();
-    this.parr.push(p);
+    this.oarr.push(p);
 }
 
 Scene.prototype.createEllipse = function (pid, x0, y0, rx, ry, color) {
     var p = new EllipsePrim(pid, x0, y0, rx, ry, color);
     p.createNode();
-    this.parr.push(p);
+    this.oarr.push(p);
 }
 
 Scene.prototype.createLine = function (pid, x0, y0, x1, y1, width, color) {
     var p = new LinePrim(pid, x0, y0, x1, y1, width, color);
     p.createNode();
-    this.parr.push(p);
+    this.oarr.push(p);
 }
 
 Scene.prototype.createPath = function (pid, x, y, coords, color) {
     var p = new PathPrim(pid, x, y, coords, color);
     p.createNode();
-    this.parr.push(p);
+    this.oarr.push(p);
 }
 
 Scene.prototype.createText = function (pid, x, y, str, s, c) {
     var p = new TextPrim(pid, x, y, str, s, c);
     p.createNode();
-    this.parr.push(p);    
+    this.oarr.push(p);    
 }
 
 Scene.prototype.createPObj = function (id, name, coords, data) {
     var p = new SPrim(0, coords, [name], data);
     p.createNode();
-    this.parr.push(p);
+    this.oarr.push(p);
 }
 
 Scene.prototype.deselect = function () {
     for (var i = 0; i < this.oarr.length; i++) {
         this.oarr[i].deselect();
-    }
-    
-    for (i = 0; i < this.parr.length; i++) {
-        this.parr[i].deselect();       
-    }
+    }    
 }
     
 Scene.prototype.pressObject = function (evt) {
@@ -112,17 +107,6 @@ Scene.prototype.pressObject = function (evt) {
         }
     }
     
-    if (mode != mode_show) {
-        for (i = 0; i < this.parr.length; i++) {
-            if (this.parr[i].node == node) {
-                this.draggingObject =  this.parr[i];
-                this.draggingObject.updateNode();
-                this.draggingObject.select();
-                this.selectedObject = this.parr[i];
-                break;    
-            }
-        }
-    }
     if (!this.draggingObject) return;
         
     if (mode == mode_edit && evt.button == 2) {
@@ -196,12 +180,8 @@ Scene.prototype.clearScene = function () {
     for (i = 0; i < this.oarr.length; i++) {
         this.oarr[i].removeNode();
     }
-    for (i = 0; i < this.parr.length; i++) {
-        this.parr[i].removeNode();
-    }
     this.oarr.length = 0;
     this.barr.length = 0;
-    this.parr.length = 0;
         
     this.removeCompleteFX();
 }
@@ -214,13 +194,19 @@ Scene.prototype.resetScene = function () {
     }
         
     for (var i = 0; i < this.oarr.length; i++) {
-        this.oarr[i].x = this.oarr[i].ex - this.oarr[i].getWidth()/2.0;
-        this.oarr[i].y = this.oarr[i].ey - this.oarr[i].getHeight()/2.0;
+        this.oarr[i].x = this.oarr[i].ex;
+        this.oarr[i].y = this.oarr[i].ey;
+
+        if (this.oarr[i].type == gobj_type_image) {
+            this.oarr[i].x -= this.oarr[i].getWidth()/2.0;
+            this.oarr[i].y -= this.oarr[i].getHeight()/2.0;
+        }
+        
         this.oarr[i].updateNode();
     }
         
     this.removeCompleteFX();
-}
+};
     
 Scene.prototype.completeFX = function () {
     var svgRoot = document.documentElement;
@@ -305,7 +291,7 @@ Scene.prototype.removeCompleteFX = function () {
         scn.fxAnim4 = null;
         scn.fxNode = null;
     }
-}
+};
     
 Scene.prototype.startNewLine = function(p) {
     this.commitPrim();
@@ -319,7 +305,7 @@ Scene.prototype.startNewLine = function(p) {
                      
     this.constrPrim.editMode = true;
     this.constrPrim.createNode();
-}
+};
  
 Scene.prototype.endNewLine = function(p) {
     if (!this.constrPrim) return;
@@ -342,9 +328,9 @@ Scene.prototype.endNewLine = function(p) {
     this.constrPrim.coords[3] = p.y - this.constrPrim.y;
     this.constrPrim.updateNode();
     this.constrPrim.select();
-    this.parr.push(this.constrPrim);
+    this.oarr.push(this.constrPrim);
     this.constrPrim = null;
-}
+};
 
 Scene.prototype.startNewEllipse = function(p) {
     this.commitPrim();
@@ -359,7 +345,7 @@ Scene.prototype.startNewEllipse = function(p) {
                         
     this.constrPrim.editMode = true;
     this.constrPrim.createNode();
-}
+};
 
 Scene.prototype.endNewEllipse = function(p) {
     if (!this.constrPrim) return;
@@ -381,9 +367,9 @@ Scene.prototype.endNewEllipse = function(p) {
     this.constrPrim.coords[3] = Math.abs(p.y - this.constrPrim.y);
     this.constrPrim.updateNode();
     this.constrPrim.select();
-    this.parr.push(this.constrPrim);
+    this.oarr.push(this.constrPrim);
     this.constrPrim = null;
-}
+};
 
 Scene.prototype.startNewRect = function(p) {
     this.commitPrim();
@@ -398,7 +384,7 @@ Scene.prototype.startNewRect = function(p) {
     this.constrPrim.editMode = true;
                                
     this.constrPrim.createNode();
-}
+};
 
 Scene.prototype.endNewRect = function(p) {
     if (!this.constrPrim) return;
@@ -420,9 +406,9 @@ Scene.prototype.endNewRect = function(p) {
     this.constrPrim.coords[3] = Math.abs(p.y - this.constrPrim.y);
     this.constrPrim.updateNode();
     this.constrPrim.select();
-    this.parr.push(this.constrPrim);
+    this.oarr.push(this.constrPrim);
     this.constrPrim = null;
-}
+};
 
 Scene.prototype.startNewPath = function(p) {
     this.commitPrim();
@@ -435,7 +421,7 @@ Scene.prototype.startNewPath = function(p) {
                                 
     this.constrPrim.editMode = true;
     this.constrPrim.createNode();
-}
+};
 
 Scene.prototype.addPointToPath = function(p) {
     if (!this.constrPrim) return false;
@@ -464,7 +450,7 @@ Scene.prototype.addPointToPath = function(p) {
         this.constrPrim.updateNode();
         return true;
     }
-}
+};
 
 Scene.prototype.endNewPath = function() {
     if (this.constrPrim.coords.length < 6) {
@@ -480,14 +466,14 @@ Scene.prototype.endNewPath = function() {
     }
     var lid = Project.getProject().createNewPath(str,this.constrPrim.data[0]);
     this.constrPrim.id = lid;
-    this.parr.push(this.constrPrim);
+    this.oarr.push(this.constrPrim);
     
     this.constrPrim.editMode = false;
-    this.parr.push(this.constrPrim);
+    this.oarr.push(this.constrPrim);
     this.constrPrim.updateNode();
     this.constrPrim.select();
     this.constrPrim = null;
-}
+};
 
 Scene.prototype.startNewText = function (p) {
     this.commitPrim();
@@ -519,7 +505,7 @@ Scene.prototype.endNewText = function () {
     this.constrPrim.updateNode();
     this.constrPrim.select();
     this.constrPrim = null;
-}
+};
 
 Scene.prototype.commitPrim = function() {
     if (this.constrPrim) {
@@ -578,24 +564,10 @@ Scene.prototype.deleteSelection = function() {
         }
     }
       
-    var q = [];
-    
-    for (i = 0; i < this.parr.length; i++) {
-        if (this.parr[i].selection) {
-            q.push(i);
-        }       
-    }
-
     this.deselect();
     for (i = r.length - 1; i >= 0; i--) {
         this.oarr[r[i]].removeNode();
         Project.getProject().deleteElement(this.oarr[r[i]].id);
         this.oarr.splice (r[i], r[i]);
-    }
-
-    for (i = q.length - 1; i >= 0; i--) {
-        this.parr[q[i]].removeNode();
-        Project.getProject().deleteElement(this.parr[q[i]].id);            
-        this.parr.splice (q[i], q[i]);
     }
 };

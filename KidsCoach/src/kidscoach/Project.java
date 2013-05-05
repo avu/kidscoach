@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -78,6 +79,7 @@ public class Project implements DropTargetListener, ActionListener {
     JPopupMenu objectEditPopup;
     ResourcePanel resourcePanel;
     SlidePanel slidePanel;
+    JLabel statusLine;
     Document prj;
     String prjName = DEFAULT_NAME;
     Path tempDir;
@@ -106,6 +108,14 @@ public class Project implements DropTargetListener, ActionListener {
         }
         return resourcePanel;
     }
+    
+    JLabel getStatusLine() {
+        if (statusLine == null) {
+            statusLine = new JLabel(" ");
+        }
+        return statusLine;
+    }
+    
     void newLineToolEnable() {
         canvas.executeScript("set_tool(\"new_line\")");
     }
@@ -1524,5 +1534,9 @@ public class Project implements DropTargetListener, ActionListener {
     
     public void popupMenu(int x, int y, String descr) {
         getObjectEditPopup().show(getCanvas(), x, y);
+    }
+    
+    public void showStatus(String str) {
+        getStatusLine().setText(str);
     }
 }

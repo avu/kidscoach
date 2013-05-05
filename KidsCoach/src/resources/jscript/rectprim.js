@@ -28,6 +28,8 @@ RectPrim.prototype.createNode = function() {
 };
 
 RectPrim.prototype.showControlPoints = function(grp) {
+    if (mode == mode_show) return;
+
     var p = document.createElementNS(svgNS, "rect");
     p.setAttributeNS(null,"x",this.coords[0]);
     p.setAttributeNS(null,"y",this.coords[1]);

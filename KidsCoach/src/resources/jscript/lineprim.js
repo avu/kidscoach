@@ -38,7 +38,9 @@ LinePrim.prototype.createNode = function() {
     this.node = grp;
 };
 
-LinePrim.prototype.showControlPoints = function(grp) {    
+LinePrim.prototype.showControlPoints = function(grp) {
+    if (mode == mode_show) return;
+
     var cp = this.addControlPoint(grp, this.coords[0], 
         this.coords[1]);
     cp.setAttributeNS(null, "onmousedown", "mouseDownCP(evt,0)");    

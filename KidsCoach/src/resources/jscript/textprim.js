@@ -29,6 +29,8 @@ TextPrim.prototype.createNode = function() {
 }
 
 TextPrim.prototype.showControlPoints = function(grp) {
+    if (mode == mode_show) return;
+
     this.addControlPoint(grp, this.coords[0], this.coords[1]);
 }
 

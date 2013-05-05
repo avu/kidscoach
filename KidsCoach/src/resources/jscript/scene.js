@@ -99,11 +99,14 @@ Scene.prototype.pressObject = function (evt) {
     
     for (var i = 0; i < this.oarr.length; i++) {
         if (this.oarr[i].node == node) {
-            this.draggingObject =  this.oarr[i];
-            this.draggingObject.updateNode();
-            this.draggingObject.select();
-            this.selectedObject = this.oarr[i];
-            break;
+            var t = scn.getTargetForObject(this.oarr[i].id);
+            if (mode == mode_edit || (mode == mode_show && t)) {
+                this.draggingObject =  this.oarr[i];
+                this.draggingObject.updateNode();
+                this.draggingObject.select();
+                this.selectedObject = this.oarr[i];
+                break;
+            }
         }
     }
     
@@ -367,6 +370,7 @@ Scene.prototype.endNewEllipse = function(p) {
     this.constrPrim.coords[3] = Math.abs(p.y - this.constrPrim.y);
     this.constrPrim.updateNode();
     this.constrPrim.select();
+    this.selectedObject = this.constrPrim;
     this.oarr.push(this.constrPrim);
     this.constrPrim = null;
 };
@@ -406,6 +410,7 @@ Scene.prototype.endNewRect = function(p) {
     this.constrPrim.coords[3] = Math.abs(p.y - this.constrPrim.y);
     this.constrPrim.updateNode();
     this.constrPrim.select();
+    this.selectedObject = this.constrPrim;
     this.oarr.push(this.constrPrim);
     this.constrPrim = null;
 };
@@ -472,6 +477,7 @@ Scene.prototype.endNewPath = function() {
     this.oarr.push(this.constrPrim);
     this.constrPrim.updateNode();
     this.constrPrim.select();
+    this.selectedObject = this.constrPrim;
     this.constrPrim = null;
 };
 
@@ -504,6 +510,7 @@ Scene.prototype.endNewText = function () {
     this.parr.push(this.constrPrim);
     this.constrPrim.updateNode();
     this.constrPrim.select();
+    this.selectedObject = this.constrPrim;
     this.constrPrim = null;
 };
 

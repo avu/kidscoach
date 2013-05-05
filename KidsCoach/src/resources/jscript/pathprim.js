@@ -40,6 +40,8 @@ PathPrim.prototype.createNode = function() {
 };
 
 PathPrim.prototype.showControlPoints = function(grp) {
+    if (mode == mode_show) return;
+
     for (var i = 0; i < this.coords.length; i+=2) {
         var cp = this.addControlPoint(grp, this.coords[i], 
             this.coords[i + 1]);

@@ -124,6 +124,11 @@ function set_line_width(size) {
 function change_color(c) {
     prim_color= c;
 }
+
+function change_prim_color(id, c) {
+    scn.changePrimColor(id, c);    
+}
+
 function mouseDownScene(evt) {
     var sobj = scn.getSelectedObject();
     var p = document.documentElement.createSVGPoint();

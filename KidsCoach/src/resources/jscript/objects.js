@@ -228,7 +228,7 @@ SPrim.prototype.showControlPoints = function(grp) {
             this.addControlPoint(grp, this.coords[i], this.coords[i+1]);
         }
     }
-}
+};
 
 
 SPrim.prototype.addControlPoint = function(grp, x, y) {
@@ -239,9 +239,11 @@ SPrim.prototype.addControlPoint = function(grp, x, y) {
     c.setAttributeNS(null,"style", "stroke:rgb(0,0,0);stroke-width:2;fill:red");
     grp.appendChild(c);
     return c;
-}
+};
 
-
+SPrim.prototype.setColor = function(c) {
+    alert("Cannot set color to abstract primitive");  
+};
     
 Target.prototype.contains = function (obj) {
     return this.x < obj.x && (this.x + this.w) > (obj.x + obj.w) &&

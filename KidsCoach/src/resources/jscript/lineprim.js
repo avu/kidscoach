@@ -96,3 +96,13 @@ LinePrim.prototype.cover = function (targ) {
            Math.abs(this.y + (this.coords[1] + this.coords[3])*0.5 -
             targ.y - targ.h*0.5) < cover_prec;
 };
+
+LinePrim.prototype.setColor = function(c) {
+    this.data[1] = c;
+    if (this.node) {
+        var list = this.node.getElementsByTagName("line");
+        list.item(0).setAttributeNS(
+            null,"style", "stroke:" + this.data[1] + 
+        ";stroke-width:" + this.data[0]);
+    }
+};

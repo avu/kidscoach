@@ -110,3 +110,12 @@ PathPrim.prototype.cover = function (targ) {
            Math.abs(this.y + (this.y0 + this.y1)*0.5 -
                     targ.y - targ.h*0.5) < cover_prec;
 };
+
+PathPrim.prototype.setColor = function(c) {
+    this.data[0] = c;
+    if (this.node) {
+        var list = this.node.getElementsByTagName("path");
+        list.item(0).setAttributeNS(
+            null,"style", "fill:" + this.data[0] + ";stroke-width:2");
+    }
+};

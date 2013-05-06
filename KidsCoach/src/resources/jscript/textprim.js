@@ -84,3 +84,11 @@ TextPrim.prototype.addControlPoint = function(grp, x, y) {
     grp.appendChild(c);
     return c;
 }
+
+TextPrim.prototype.setColor = function(c) {
+    this.data[2] = c;
+    if (this.node) {
+        var list = this.node.getElementsByTagName("text");
+        list.item(0).setAttributeNS(null,"fill", this.data[2]);
+    }
+};

@@ -115,7 +115,9 @@ Scene.prototype.pressObject = function (evt) {
     if (mode == mode_edit && evt.button == 2) {
         importPackage(Packages.kidscoach);
         Project.getProject().popupMenu(
-            evt.clientX, evt.clientY, "редактирование");
+            evt.clientX, evt.clientY, this.draggingObject.id, 
+            this.draggingObject.type);
+            
     } else {
         var p = document.documentElement.createSVGPoint();
         p.x = evt.clientX;
@@ -132,7 +134,15 @@ Scene.prototype.pressObject = function (evt) {
         this.curH = this.draggingObject.getHeight();
     }
 }
-    
+
+Scene.prototype.changePrimColor = function(id, c) {
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].id == id) {
+            this.oarr[i].setColor(c);
+        }
+    }
+};
+
 Scene.prototype.endDrag = function () {
     this.draggingObject = null;
 }
@@ -426,6 +436,7 @@ Scene.prototype.startNewPath = function(p) {
                                 
     this.constrPrim.editMode = true;
     this.constrPrim.createNode();
+    show_status("Нажмите ENTER для создания или ESC для отмены");
 };
 
 Scene.prototype.addPointToPath = function(p) {
@@ -490,6 +501,7 @@ Scene.prototype.startNewText = function (p) {
                                    "", text_size, prim_color);
     this.constrPrim.editMode = true;
     this.constrPrim.createNode();
+    show_status("Нажмите ENTER для создания или ESC для отмены");
 }
 
 Scene.prototype.endNewText = function () {
@@ -529,9 +541,11 @@ Scene.prototype.keyboard = function(e) {
         if (this.constrPrim) {
             this.constrPrim.removeNode();
             this.constrPrim = null;
+            show_status(" ");
         }
     } else if (e.charCode == ascii_enter) {
         this.commitPrim();
+        show_status(" ");
     } else if (e.charCode == ascii_backspace || e.charCode == ascii_delete) {
         if (this.constrPrim) {
             if (this.constrPrim.prims[0] == "text") {

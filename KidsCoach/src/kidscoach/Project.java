@@ -1,5 +1,6 @@
 package kidscoach;
 
+import java.awt.Color;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -32,6 +33,7 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -84,6 +86,7 @@ public class Project implements DropTargetListener, ActionListener {
     String prjName = DEFAULT_NAME;
     Path tempDir;
     int objCount;
+    int selectedObject;
     boolean isBuildCompleted;
     boolean isNewDocument;
     boolean isSavedDocument;
@@ -148,7 +151,11 @@ public class Project implements DropTargetListener, ActionListener {
     void changeColor(String rgb) {
         canvas.executeScript("change_color(\"" + rgb + "\")");        
     }
-    
+
+    void changePrimColor(String pid, String rgb) {
+        canvas.executeScript("change_prim_color(" + pid + ", \"" + rgb + "\")");        
+    }
+
     void deleteSelection() {
         canvas.executeScript("delete_selection()");        
     }
@@ -189,6 +196,10 @@ public class Project implements DropTargetListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if ("Delete".equals(e.getActionCommand())) {
             deleteSelection();
+        } else if ("Color".equals(e.getActionCommand())) {
+            Color pColor = JColorChooser.showDialog(getCanvas(),
+                                 "Выберите цвет", Color.BLACK);
+            changePrimColor(Integer.toString(selectedObject), pColor);
         }
     }
 
@@ -232,14 +243,19 @@ public class Project implements DropTargetListener, ActionListener {
         return canvas;
     }
     
-    final JPopupMenu getObjectEditPopup() {
-        if (objectEditPopup == null) {
-            objectEditPopup = new JPopupMenu();
-            JMenuItem item = new JMenuItem("Удалить");
+    final JPopupMenu getObjectEditPopup(String type) {
+        objectEditPopup = new JPopupMenu();
+        if (!"image".equals(type)) {
+            JMenuItem item = new JMenuItem("Цвет");
             item.addActionListener(this);
-            item.setActionCommand("Delete");
+            item.setActionCommand("Color");
             objectEditPopup.add(item);
         }
+
+        JMenuItem item = new JMenuItem("Удалить");
+        item.addActionListener(this);
+        item.setActionCommand("Delete");
+        objectEditPopup.add(item);
         return objectEditPopup;
     }
 
@@ -1417,6 +1433,20 @@ public class Project implements DropTargetListener, ActionListener {
       return 0;
    }
    
+   public void changePrimColor(String id, Color col) {
+        Element slide = getSlide(curSlideId);
+      
+        Element objs = lookupElement(slide, "objects");
+        if (objs != null) {
+            Element e = lookupElement(objs, Integer.parseInt(id));
+            if (e != null) {
+                String color = "#" + Integer.toHexString(col.getRGB()).substring(2);
+                e.setAttribute("color", color);
+                changePrimColor(id, color);
+            }
+        }
+    }
+   
     public void changeObject(String id, float x, float y, float w, float h) {
         Element slide = getSlide(curSlideId);
 
@@ -1506,8 +1536,9 @@ public class Project implements DropTargetListener, ActionListener {
         }
     }
     
-    public void popupMenu(int x, int y, String descr) {
-        getObjectEditPopup().show(getCanvas(), x, y);
+    public void popupMenu(int x, int y, int id, String type) {
+        selectedObject = id;
+        getObjectEditPopup(type).show(getCanvas(), x, y);
     }
     
     public void showStatus(String str) {

@@ -97,3 +97,12 @@ RectPrim.prototype.cover = function (targ) {
     return Math.abs(this.x  + this.getWidth()*0.5 - targ.x - targ.w*0.5) < cover_prec &&
         Math.abs(this.y + this.getHeight()*0.5 - targ.y - targ.h*0.5) < cover_prec;
 };
+
+RectPrim.prototype.setColor = function(c) {
+    this.data[0] = c;
+    if (this.node) {
+        var list = this.node.getElementsByTagName("rect");
+        list.item(0).setAttributeNS(
+            null,"style", "fill:" + this.data[0] + ";stroke-width:2");
+    }
+};

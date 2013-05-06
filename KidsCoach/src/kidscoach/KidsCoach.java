@@ -158,7 +158,7 @@ public class KidsCoach extends JFrame implements ActionListener {
             
                 btn.setIcon(new ImageIcon(img));
                 
-                prj.changeColor("#" + Integer.toHexString(pColor.getRGB()&0x00ffffff));
+                prj.changeColor("#" + Integer.toHexString(pColor.getRGB()).substring(2));
             }
         }
     }

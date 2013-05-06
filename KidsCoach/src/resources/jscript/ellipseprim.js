@@ -97,3 +97,12 @@ EllipsePrim.prototype.cover = function (targ) {
     return Math.abs(this.x - targ.x - targ.w*0.5) < cover_prec &&
     Math.abs(this.y - targ.y - targ.h*0.5) < cover_prec;
 };
+
+EllipsePrim.prototype.setColor = function(c) {
+    this.data[0] = c;
+    if (this.node) {
+        var list = this.node.getElementsByTagName("ellipse");
+        list.item(0).setAttributeNS(
+            null,"style", "fill:" + this.data[0] + ";stroke-width:2");
+    }
+};

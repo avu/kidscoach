@@ -443,7 +443,7 @@ Scene.prototype.addPointToPath = function(p) {
         }
         var lid = Project.getProject().createNewPath(str);
         this.constrPrim.id = lid;
-        this.parr.push(this.constrPrim);
+        this.oarr.push(this.constrPrim);
         this.constrPrim.editMode = false;
 
         this.constrPrim.updateNode();
@@ -507,7 +507,7 @@ Scene.prototype.endNewText = function () {
     this.constrPrim.id = lid;
                 
     this.constrPrim.editMode = false;
-    this.parr.push(this.constrPrim);
+    this.oarr.push(this.constrPrim);
     this.constrPrim.updateNode();
     this.constrPrim.select();
     this.selectedObject = this.constrPrim;

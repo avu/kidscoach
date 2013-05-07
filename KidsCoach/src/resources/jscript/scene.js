@@ -578,10 +578,19 @@ Scene.prototype.deleteSelection = function() {
     
     importPackage(Packages.kidscoach);
     var r = [];
-    
+    var idSet = new HashSet();
     for (var i = 0; i < this.oarr.length; i++) {
         if (this.oarr[i].selection) {
             r.push(i);
+            idSet.add(this.oarr[i].id);
+        }
+    }
+    
+    var rt = [];
+    
+    for (i = 0; i < this.tarr.length; i++) {
+        if (idSet.contains(this.tarr[i].id)) {
+            rt.push(i);
         }
     }
       
@@ -590,5 +599,10 @@ Scene.prototype.deleteSelection = function() {
         this.oarr[r[i]].removeNode();
         Project.getProject().deleteElement(this.oarr[r[i]].id);
         this.oarr.splice (r[i], r[i]);
+    }
+    
+    for (i = rt.length - 1; i >= 0; i--) {
+        this.tarr[rt[i]].removeNode();
+        this.tarr.splice (rt[i], rt[i]);        
     }
 };

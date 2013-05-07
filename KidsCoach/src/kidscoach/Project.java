@@ -847,6 +847,9 @@ public class Project implements DropTargetListener, ActionListener {
             installFile("resources/jscript/textprim.js", "textprim.js");
             installFile("resources/jscript/scene.js", "scene.js");
             installFile("resources/jscript/bridge.js", "bridge.js");
+            installFile("resources/jscript/jshashset.js", "jshashset.js");
+            installFile("resources/jscript/jshashtable.js", "jshashtable.js");
+
             installFile("resources/svg/face.svg", "face.svg");
             
             installResourceFromBundle("resources/svg/face.svg", "face.svg");
@@ -1530,6 +1533,14 @@ public class Project implements DropTargetListener, ActionListener {
         Element objs = lookupElement(slide, "objects");
         if (objs != null) {
             Element e = lookupElement(objs, Integer.parseInt(id));
+            if (e != null) {
+                e.getParentNode().removeChild(e);
+            }
+        }
+        
+        Element targs = lookupElement(slide, "targets");
+        if (objs != null) {
+            Element e = lookupElement(targs, Integer.parseInt(id));
             if (e != null) {
                 e.getParentNode().removeChild(e);
             }

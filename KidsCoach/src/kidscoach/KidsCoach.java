@@ -15,6 +15,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -58,8 +59,7 @@ public class KidsCoach extends JFrame implements ActionListener {
         } else if ("Delete".equals(e.getActionCommand())) {
             prj.deleteSelection();
         } else if ("Start".equals(e.getActionCommand())) {
-            prj.showModeEnable();
-            setTitle("Обучение в играх (игра)");
+            prj.playSlide(mainFrame);
         } else if ("Stop".equals(e.getActionCommand())) {
             prj.editModeEnable();
             setTitle("Обучение в играх (редактирование)");
@@ -190,7 +190,7 @@ public class KidsCoach extends JFrame implements ActionListener {
         
         menu = new Menu(this, "Запуск", new String[][] {
             {"Start", "s16/media-playback-start.png", "Запуск"},
-            {"Stop", "s16/media-playback-stop.png", "Остановить"}
+//            {"Stop", "s16/media-playback-stop.png", "Остановить"}
         });
         
         menuBar.add(menu);
@@ -235,7 +235,7 @@ public class KidsCoach extends JFrame implements ActionListener {
         
         animBar = new ToolBar(this, new String[][] {
             {"Start", "s32/media-playback-start.png", "Запуск"},
-            {"Stop", "s32/media-playback-stop.png", "Остановить"}
+//            {"Stop", "s32/media-playback-stop.png", "Остановить"}
         });
         
         primBar = new ToolBar(this, new String[][] {

@@ -1,6 +1,10 @@
 package kidscoach;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -12,6 +16,9 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,9 +41,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -78,6 +88,8 @@ public class Project implements DropTargetListener, ActionListener {
     }
     
     SCanvas canvas;
+    SCanvas savedCanvas;
+    JDialog playDlg;
     JPopupMenu objectEditPopup;
     ResourcePanel resourcePanel;
     SlidePanel slidePanel;
@@ -88,6 +100,7 @@ public class Project implements DropTargetListener, ActionListener {
     int objCount;
     int selectedObject;
     boolean isBuildCompleted;
+    boolean isBuildForShowCompleted;
     boolean isNewDocument;
     boolean isSavedDocument;
     
@@ -200,6 +213,13 @@ public class Project implements DropTargetListener, ActionListener {
             Color pColor = JColorChooser.showDialog(getCanvas(),
                                  "Выберите цвет", Color.BLACK);
             changePrimColor(Integer.toString(selectedObject), pColor);
+        } else if ("Stop".equals(e.getActionCommand())) {
+            playDlg.setVisible(false);
+            restoreCanvas();
+            playDlg.dispose();
+            playDlg = null;
+        } else if ("Start".equals(e.getActionCommand())) {
+            showModeEnable();
         }
     }
 
@@ -688,6 +708,49 @@ public class Project implements DropTargetListener, ActionListener {
         });
         
         canvas.loadSVGDocument(new File(scenePath).toURI().toString());
+    
+        return true;
+    }
+    
+    private boolean showCurrentSlide() {
+        String scenePath = FileSystems.getDefault().getPath(tempDir.toString(), 
+                                                        "scene.svg").toString();
+        
+        isBuildForShowCompleted = false;
+        canvas.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
+            @Override
+            public void gvtBuildCompleted(GVTTreeBuilderEvent evt) {
+
+                final TextSelectionManager tmgr = canvas.getTextSelectionManager();
+                tmgr.addSelectionListener(new SelectionAdapter() {
+
+                    @Override
+                    public void selectionChanged(SelectionEvent se) {
+                        tmgr.clearSelection();
+                    }
+
+                    @Override
+                    public void selectionDone(SelectionEvent se) {
+                        tmgr.clearSelection();
+                    }
+
+                    @Override
+                    public void selectionCleared(SelectionEvent se) {
+                    }
+
+                    @Override
+                    public void selectionStarted(SelectionEvent se) {
+                        tmgr.clearSelection();
+                    }
+                });
+//
+                showModeEnable();
+                readSlide(curSlideId);
+            } 
+        });
+        
+        canvas.loadSVGDocument(new File(scenePath).toURI().toString());
+        
     
         return true;
     }
@@ -1554,5 +1617,61 @@ public class Project implements DropTargetListener, ActionListener {
     
     public void showStatus(String str) {
         getStatusLine().setText(str);
+    }
+    
+    public void saveCanvas() {
+        savedCanvas = canvas;
+    }
+    
+    public void restoreCanvas() {
+        canvas = savedCanvas;
+    }
+    
+    public void setCanvas(SCanvas nc) {
+        canvas = nc;
+    }
+    
+    public void playSlide(JFrame mainFrame) {
+        saveCanvas();
+        setCanvas(null);
+        playDlg = new JDialog(mainFrame);
+        ToolBar showAnimBar = new ToolBar(this, new String[][] {
+            {"Start", "s32/media-playback-start.png", "Запуск"},
+            {"Stop", "s32/media-playback-stop.png", "Остановить"}
+        });
+        
+        getCanvas().setPreferredSize(new Dimension(800,600));
+        playDlg.add(getCanvas(), BorderLayout.CENTER);
+        playDlg.add(showAnimBar, BorderLayout.NORTH);
+
+        //playDlg.pack();
+        playDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        playDlg.setTitle("Обучение в играх (игра)");
+
+        playDlg.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                restoreCanvas();
+            }
+        });
+                
+        showCurrentSlide();
+        
+        GraphicsDevice gd =
+            GraphicsEnvironment.getLocalGraphicsEnvironment().
+                getDefaultScreenDevice();
+
+        boolean isFullScreen = gd.isFullScreenSupported();
+        if (isFullScreen) {
+            playDlg.setUndecorated(true);
+            playDlg.setResizable(false);
+            playDlg.validate();
+            gd.setFullScreenWindow(playDlg);
+            playDlg.setVisible(true);
+        } else {
+            playDlg.setModal(true);
+            playDlg.pack();
+            playDlg.setVisible(true);
+        }
     }
 }

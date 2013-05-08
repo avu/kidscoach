@@ -251,6 +251,7 @@ Target.prototype.contains = function (obj) {
 }
    
 Target.prototype.createNode = function() {
+    if (mode == mode_show) return;
     var g = document.documentElement;
     var img = document.createElementNS(svgNS, "image");
     img.setAttributeNS(null,"width",this.w);	

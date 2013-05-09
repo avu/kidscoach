@@ -5,6 +5,9 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 import org.apache.batik.bridge.UpdateManager;
@@ -15,6 +18,14 @@ public class SCanvas extends JSVGCanvas {
     private static final Logger log = Logger.getLogger(SCanvas.class.getName());
     
     public SCanvas() {
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                SCanvas.this.repaint();
+                SCanvas.this.validate();
+                SCanvas.this.repaint();                
+            }
+        });
     }
     
     Image getSnapshot(int width, int height) {

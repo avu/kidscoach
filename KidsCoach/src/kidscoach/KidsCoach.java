@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -27,6 +29,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.batik.ext.swing.GridBagConstants;
 
 /**
  *
@@ -166,7 +169,9 @@ public class KidsCoach extends JFrame implements ActionListener {
     public KidsCoach() {
         super("Обучение в играх");
         prj = Project.getProject();
-        prj.getCanvas().setPreferredSize(new Dimension(800,600));
+        Dimension canvasSize = new Dimension(800,600);
+        prj.getCanvas().setPreferredSize(canvasSize);
+     
         prj.create();
 
         setTitle("Обучение в играх (редактирование)");
@@ -262,17 +267,65 @@ public class KidsCoach extends JFrame implements ActionListener {
         toolPane.add(animBar, BorderLayout.WEST);
         toolPane.add(primBar, BorderLayout.WEST);
         //toolPane.add(rmodeBar, BorderLayout.WEST);
-        getContentPane().add(toolPane, BorderLayout.NORTH);
-        getContentPane().add(prj.getStatusLine(), BorderLayout.SOUTH);
-
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, 
-            prj.getCanvas(), prj.getResourcePanel());
         
-        prj.getSlidePanel().setPreferredSize(new Dimension(100,600));
+        GridBagLayout gbl = new GridBagLayout();
+        getContentPane().setLayout(gbl);
+        GridBagConstraints constr = new GridBagConstraints();
+        constr.weightx = 100;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 0;
+        constr.gridwidth = 3;
+        constr.gridheight = 1;
+        constr.anchor = GridBagConstants.NORTHWEST;
+        
+        getContentPane().add(toolPane, constr);
+        
+        constr = new GridBagConstraints();
+        constr.weightx = 100;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 2;
+        constr.gridwidth = 3;
+        constr.gridheight = 1;
 
-        JSplitPane splitSlides = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true,
-             prj.getSlidePanel(), splitPane);
+        getContentPane().add(prj.getStatusLine(), constr);
+
+        constr = new GridBagConstraints();
+        constr.weightx = 0;
+        constr.weighty = 100;
+        constr.gridx = 0;
+        constr.gridy = 1;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.fill = GridBagConstants.VERTICAL;
+
+        prj.getSlidePanel().setPreferredSize(new Dimension(100,600));
+        getContentPane().add(prj.getSlidePanel(), constr);
+
+        
+        constr = new GridBagConstraints();
+        constr.weightx = 100;
+        constr.weighty = 100;
+        constr.gridx = 1;
+        constr.gridy = 1;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+
+        getContentPane().add(prj.getCanvas(), constr);
+
+        constr = new GridBagConstraints();
+        constr.weightx = 0;
+        constr.weighty = 100;
+        constr.gridx = 2;
+        constr.gridy = 1;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.anchor = GridBagConstants.WEST;
+        constr.fill = GridBagConstants.VERTICAL;
+        prj.getResourcePanel().setPreferredSize(new Dimension(100,600));
+
+        getContentPane().add(prj.getResourcePanel(), constr);
         
         addWindowListener(new WindowAdapter() {
             @Override
@@ -281,20 +334,8 @@ public class KidsCoach extends JFrame implements ActionListener {
                 System.exit(0);
             }
         });
-
-        splitPane.setResizeWeight(0.85);
-        splitPane.setDividerLocation(0.85);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setDividerSize(8);
-        splitSlides.setResizeWeight(0.2);
-        splitSlides.setDividerLocation(0.2);
-        splitSlides.setOneTouchExpandable(true);
-        splitSlides.setDividerSize(8);
-
-        getContentPane().add(splitSlides, BorderLayout.CENTER);
-        prj.getResourcePanel().setPreferredSize(new Dimension(100,600));
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //setPreferredSize(new Dimension(800, 600));
         pack();
         setVisible(true);
     }

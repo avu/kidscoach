@@ -747,7 +747,11 @@ public class Project implements DropTargetListener, ActionListener {
                 });
 //
                 showModeEnable();
-                readSlide(curSlideId);
+                clearScene();
+                Element s = getSlide(curSlideId);
+                if (s != null) {
+                    readSlide(s);
+                }
             } 
         });
         

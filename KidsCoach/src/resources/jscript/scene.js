@@ -27,7 +27,7 @@ Scene.prototype.addTarget = function (tid, x, y, w, h) {
     var t = new Target(tid, x, y, w, h);
     t.createNode();
     this.tarr.push(t);
-}
+};
     
 Scene.prototype.removeTarget = function (tid) {
     for (var i = this.barr.length - 1; i >= 0; i--) {
@@ -42,64 +42,65 @@ Scene.prototype.removeTarget = function (tid) {
             this.tarr.splice (j, j);
         }
     }
-}
+};
      
 Scene.prototype.addObject = function (oid, name, x, y, w, h) {
     var o = new SObj(oid, name, x, y, w, h);
     o.createNode();
     this.oarr.push(o);
-}
+};
 Scene.prototype.createRect = function (pid, x0, y0, w, h, color) {
     var p = new RectPrim(pid, x0, y0, w, h, color);
     p.createNode();
     this.oarr.push(p);
-}
+};
 
 Scene.prototype.createEllipse = function (pid, x0, y0, rx, ry, color) {
     var p = new EllipsePrim(pid, x0, y0, rx, ry, color);
     p.createNode();
     this.oarr.push(p);
-}
+};
 
 Scene.prototype.createLine = function (pid, x0, y0, x1, y1, width, color) {
     var p = new LinePrim(pid, x0, y0, x1, y1, width, color);
     p.createNode();
     this.oarr.push(p);
-}
+};
 
 Scene.prototype.createPath = function (pid, x, y, coords, color) {
     var p = new PathPrim(pid, x, y, coords, color);
     p.createNode();
     this.oarr.push(p);
-}
+};
 
 Scene.prototype.createText = function (pid, x, y, str, s, c) {
     var p = new TextPrim(pid, x, y, str, s, c);
     p.createNode();
     this.oarr.push(p);    
-}
+};
 
 Scene.prototype.createPObj = function (id, name, coords, data) {
     var p = new SPrim(0, coords, [name], data);
     p.createNode();
     this.oarr.push(p);
-}
+};
 
 Scene.prototype.deselect = function () {
     for (var i = 0; i < this.oarr.length; i++) {
         this.oarr[i].deselect();
     }    
-}
+};
     
 Scene.prototype.pressObject = function (evt) {
     var node = evt.currentTarget;
     if (!node) return;
     
     this.deselect();
-    
+
+
     for (var i = 0; i < this.oarr.length; i++) {
         if (this.oarr[i].node == node) {
-            var t = scn.getTargetForObject(this.oarr[i].id);
+            var t = this.getTargetForObject(this.oarr[i].id);
             if (mode == mode_edit || (mode == mode_show && t)) {
                 this.draggingObject =  this.oarr[i];
                 this.draggingObject.updateNode();
@@ -109,9 +110,21 @@ Scene.prototype.pressObject = function (evt) {
             }
         }
     }
-    
-    if (!this.draggingObject) return;
         
+    if (!this.draggingObject) {
+        for (i = 0; i < this.tarr.length; i++) {
+            if (this.tarr[i].node == node) {
+                this.draggingObject =  this.tarr[i];
+                this.selectedObject = this.tarr[i];
+                this.draggingObject.select();
+            }
+        }
+    }
+    
+    for (i = 0; i < this.tarr.length; i++) {
+        this.tarr[i].updateNode();
+    }
+    
     if (mode == mode_edit && evt.button == 2) {
         importPackage(Packages.kidscoach);
         Project.getProject().popupMenu(
@@ -133,7 +146,7 @@ Scene.prototype.pressObject = function (evt) {
         this.curW = this.draggingObject.getWidth();
         this.curH = this.draggingObject.getHeight();
     }
-}
+};
 
 Scene.prototype.changePrimColor = function(id, c) {
     for (var i = 0; i < this.oarr.length; i++) {
@@ -145,7 +158,7 @@ Scene.prototype.changePrimColor = function(id, c) {
 
 Scene.prototype.endDrag = function () {
     this.draggingObject = null;
-}
+};
     
 Scene.prototype.getTargetForObject = function (id) {
     for (var i = 0; i < this.barr.length; i++) {
@@ -158,22 +171,22 @@ Scene.prototype.getTargetForObject = function (id) {
         }
     }
     return null;
-}
+};
     
 Scene.prototype.completeTargets = function () {
     for (var i = 0; i < this.tarr.length; i++) {
         if (!this.tarr[i].done) return false;
     }
     return true;
-}
+};
     
 Scene.prototype.getDraggingObject = function () {
     return this.draggingObject;
-}
+};
 
 Scene.prototype.getSelectedObject = function () {
     return this.selectedObject;
-}
+};
     
 Scene.prototype.bindTarget = function (tid, oid) {
     this.barr.push(new Binding(tid, oid));
@@ -183,7 +196,7 @@ Scene.prototype.bindTarget = function (tid, oid) {
             break;
         }
     }
-}
+};
     
 Scene.prototype.clearScene = function () {
     for (var i = 0; i < this.tarr.length; i++) {
@@ -197,7 +210,7 @@ Scene.prototype.clearScene = function () {
     this.barr.length = 0;
         
     this.removeCompleteFX();
-}
+};
     
 Scene.prototype.resetScene = function () {
     this.deselect();
@@ -289,7 +302,7 @@ Scene.prototype.completeFX = function () {
     this.fxAnim3.beginElement();        
     this.fxAnim4.beginElement();        
 
-}
+};
     
 Scene.prototype.removeCompleteFX = function () {
     if (this.fxNode) {
@@ -502,7 +515,7 @@ Scene.prototype.startNewText = function (p) {
     this.constrPrim.editMode = true;
     this.constrPrim.createNode();
     show_status("Нажмите ENTER для создания или ESC для отмены");
-}
+};
 
 Scene.prototype.endNewText = function () {
     if (this.constrPrim.data[0].length == 0) {
@@ -534,7 +547,7 @@ Scene.prototype.commitPrim = function() {
             this.endNewText();
         }
     }
-}
+};
 
 Scene.prototype.keyboard = function(e) {
     if (e.charCode == ascii_esc) {

@@ -1,6 +1,7 @@
 
 var gobj_type_image = "image";
 var gobj_type_geom = "geom";
+var gobj_type_target = "target";
 
 function Binding (tid, oid) {
     this.tid = tid;
@@ -53,7 +54,11 @@ GObj.prototype.setHeight = function (h) {
 GObj.prototype.select = function() {
     if (!this.selection && this.node) {
         importPackage(Packages.kidscoach);
-        Project.getProject().selectObject("objects", "object", this.id);
+        if (this.type != "target") {
+            Project.getProject().selectObject("objects", "object", this.id);
+        } else {
+            Project.getProject().selectObject("targets", "target", this.id);            
+        }
         
         this.selection = document.createElementNS(svgNS,"rect");
         this.selection.setAttributeNS(null,"id", "selection");	      
@@ -62,7 +67,7 @@ GObj.prototype.select = function() {
         this.selection.setAttributeNS(null,"x",0);		
         this.selection.setAttributeNS(null,"y",0);
         if (mode == mode_show) {
-        this.selection.setAttributeNS(null,"stroke","black");
+            this.selection.setAttributeNS(null,"stroke","black");
             this.selection.setAttributeNS(null,"stroke","none");            
         } else {
             this.selection.setAttributeNS(null,"stroke","black");            
@@ -137,6 +142,7 @@ GObj.prototype.addDragProp = function(grp) {
 };
 
 function Target (tid, x, y, w, h) {
+    GObj.call(this, gobj_type_target);
     this.id = tid;
     this.x = x;
     this.y = y;
@@ -187,11 +193,11 @@ SObj.prototype.getHeight = function() {
 
 SObj.prototype.setWidth = function(w) {
     this.w = w;
-}
+};
 
 SObj.prototype.setHeight = function(h) {
     this.h = h;
-}
+};
 
 SObj.prototype.resize = function(curW, curH, dw, dh) {        
     var d = Math.max(dw, dh);
@@ -204,7 +210,7 @@ SObj.prototype.resize = function(curW, curH, dw, dh) {
         this.deselect();
         this.select();
     }
-}
+};
 
 function SPrim (pid, type, x, y, coords, prims, data) {
     GObj.call(this, type);
@@ -248,8 +254,42 @@ SPrim.prototype.setColor = function(c) {
 Target.prototype.contains = function (obj) {
     return this.x < obj.x && (this.x + this.w) > (obj.x + obj.w) &&
     this.y < obj.y && (this.y + this.h) > (obj.y + obj.h);
-}
-   
+};
+
+Target.prototype = Object.create(GObj.prototype);
+
+Target.prototype.getX = function() {
+    return this.x;
+};
+
+Target.prototype.getY = function() {
+    return this.y;
+};
+
+Target.prototype.setX = function(x) {
+    this.x = x;
+};
+
+Target.prototype.setY = function(y) {
+    this.y = y;
+};
+
+Target.prototype.getWidth = function() {
+    return this.w;
+};
+
+Target.prototype.getHeight = function() {
+    return this.h;
+};
+
+Target.prototype.setWidth = function(w) {
+    this.w = w;
+};
+
+Target.prototype.setHeight = function(h) {
+    this.h = h;
+};
+
 Target.prototype.createNode = function() {
     if (mode == mode_show) return;
     var g = document.documentElement;
@@ -258,29 +298,39 @@ Target.prototype.createNode = function() {
     img.setAttributeNS(null,"height",this.h);
     img.setAttributeNS(xlinkNS, "xlink:href", "targ.svg");
         
-    img.setAttributeNS(null,"x",this.x);		
-    img.setAttributeNS(null,"y",this.y);	
+    
+    var grp = document.createElementNS(svgNS, "g");
+                  
+    grp.appendChild(img);
+    this.addDragProp(grp);
+    
     var s = document.getElementById("scn");
-    g.insertBefore(img, s);
-    this.node = img;
-}
+    g.appendChild(grp);
+    this.node = grp;
+};
+
    
 Target.prototype.removeNode = function() {
     if (this.node) {
         this.node.parentNode.removeChild(this.node);
         this.node = null;
     }
-}
+};
+
+Target.prototype.updateNode = function() {
+    this.removeNode();
+    this.createNode();
+};
     
 SObj.prototype.contains = function (targ) {
     return this.x < targ.x && (this.x + this.w) > (targ.x + targ.w) &&
     this.y < targ.y && (this.y + this.h) > (targ.y + targ.h);
-}
+};
 
 SObj.prototype.cover = function (targ) {
     return Math.abs(this.x + this.w*0.5 - targ.x - targ.w*0.5) < cover_prec &&
     Math.abs(this.y + this.h*0.5 - targ.y - targ.h*0.5) < cover_prec;
-}
+};
     
 SObj.prototype.createNode = function() {
     var svgRoot = document.documentElement;
@@ -296,7 +346,7 @@ SObj.prototype.createNode = function() {
         
     svgRoot.appendChild(grp);
     this.node = grp;
-}
+};
     
 
 SObj.prototype.removeNode = function() {
@@ -304,4 +354,4 @@ SObj.prototype.removeNode = function() {
         this.node.parentNode.removeChild(this.node);
         this.node = null;
     }
-}
+};

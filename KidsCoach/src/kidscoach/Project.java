@@ -428,6 +428,8 @@ public class Project implements DropTargetListener, ActionListener {
                     sobj.appendChild(objs);
                     Element targs = prj.createElement("targets");
                     sobj.appendChild(targs);
+                    Element binds = prj.createElement("bindings");
+                    sobj.appendChild(binds);
 
                     String emptySlidePath = null;
                     try {
@@ -1146,25 +1148,36 @@ public class Project implements DropTargetListener, ActionListener {
       return true;
    }
    
-   public void addTarget(String id, float x, float y) {
-       Element slide = getSlide(curSlideId);
+    public int addTarget(String oid, float x, float y) {
+        Element slide = getSlide(curSlideId);
+        Element targsEl = lookupElement(slide, "targets");
+        
+        int res = objCount;
+        if (targsEl != null) {
+            Element sobj = prj.createElement("target");
+            sobj.setAttribute("id", Integer.toString(res));
+            sobj.setAttribute("x", Float.toString(x));
+            sobj.setAttribute("y", Float.toString(y));
 
-       for (Node obj = slide.getFirstChild(); obj != null; 
-           obj = obj.getNextSibling()) 
-      {
-          if (obj instanceof Element)  {
-              Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("targets")) {
-                  Element sobj = prj.createElement("target");
-                  sobj.setAttribute("id", id);
-                  sobj.setAttribute("x", Float.toString(x));
-                  sobj.setAttribute("y", Float.toString(y));
-
-                  objsEl.appendChild(sobj);
-              }
-          }
-      }
-   }
+            targsEl.appendChild(sobj);
+            
+            Element countEl = lookupElement(prj.getFirstChild(), "count");
+            countEl.setAttribute("value", Integer.toString(objCount + 1));
+            objCount++;
+        
+        
+            Element bindsEl = lookupElement(slide, "bindings");
+        
+            if (bindsEl != null) {
+                Element bnd = prj.createElement("bind");
+                bnd.setAttribute("tid", Integer.toString(res));
+                bnd.setAttribute("oid", oid);
+                bindsEl.appendChild(bnd);
+            }
+            return res;
+        }
+        return -1;
+    }
    
    public int createNewLine(float x0, float y0, float x1, float y1, float w, String color) {
        Element slide = getSlide(curSlideId);
@@ -1661,7 +1674,9 @@ public class Project implements DropTargetListener, ActionListener {
             GraphicsEnvironment.getLocalGraphicsEnvironment().
                 getDefaultScreenDevice();
 
+        // boolean isFullScreen = false;
         boolean isFullScreen = gd.isFullScreenSupported();
+
         if (isFullScreen) {
             playDlg.setUndecorated(true);
             playDlg.setResizable(false);

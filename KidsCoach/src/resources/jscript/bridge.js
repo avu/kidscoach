@@ -79,7 +79,6 @@ function mouseDownCP(evt,num) {
 
 function create_target(id, x, y) {
     scn.addTarget(id, x - 60, y - 60, 120, 120);
-    scn.bindTarget(id,id);
 }
 
 function create_line(id, x1, y1, x2, y2, w, c) {
@@ -87,7 +86,7 @@ function create_line(id, x1, y1, x2, y2, w, c) {
 }
 
 function create_ellipse(id, cx, cy, rx, ry, c) {
-    scn.createEllipse(id, cx, cy, rx, ry, c)
+    scn.createEllipse(id, cx, cy, rx, ry, c);
 }
 
 function create_rect(id, x, y, w, h, c) {
@@ -149,9 +148,9 @@ function mouseDownScene(evt) {
             targ.removeNode();
             targ.createNode();  
         } else {
-            Project.getProject().addTarget(sobj.id, p.x, p.y);
-            scn.addTarget(sobj.id, p.x - 60, p.y - 60, 120, 120);
-            scn.bindTarget(sobj.id, sobj.id);
+            var tid = Project.getProject().addTarget(sobj.id, p.x, p.y);
+            scn.addTarget(tid, p.x - 60, p.y - 60, 120, 120);
+            scn.bindTarget(tid, sobj.id);
         }
     } else if (tool == tool_new_line) {
         scn.startNewLine(p);
@@ -211,13 +210,16 @@ function mouseMove(evt) {
             scn.constrPrim.coords[2] = p.x - scn.constrPrim.x;
             scn.constrPrim.coords[3] = p.y - scn.constrPrim.y;
             scn.constrPrim.updateNode();
-            return;
         } else if (tool == tool_new_ellipse || tool == tool_new_rectangle) {
             scn.constrPrim.coords[2] = Math.abs(p.x - scn.constrPrim.x);
             scn.constrPrim.coords[3] = Math.abs(p.y - scn.constrPrim.y);
             scn.constrPrim.updateNode();
-            return;
         }
+        
+        for (i = 0; i < scn.tarr.length; i++) {
+            scn.tarr[i].updateNode();
+        }
+        return;
     }
     
     
@@ -266,6 +268,8 @@ function mouseMove(evt) {
                 ey = p.y;
             }
         }
+        
+        
         importPackage(Packages.kidscoach);
         
         drobj.ex = ex;
@@ -304,6 +308,11 @@ function mouseMove(evt) {
             Project.getProject().changeText(drobj.id,
                 ex, ey, drobj.data[0], 
                 drobj.data[1], drobj.data[2]);
+        } else if (drobj.type == gobj_type_target) {
+            drobj.ex += drobj.getWidth()/2.0;
+            drobj.ey += drobj.getHeight()/2.0;
+            Project.getProject().changeTarget(drobj.id, 
+                ex+drobj.getWidth()/2.0, ey+drobj.getHeight()/2.0);
         }
     }
 }

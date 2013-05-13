@@ -32,14 +32,14 @@ Scene.prototype.addTarget = function (tid, x, y, w, h) {
 Scene.prototype.removeTarget = function (tid) {
     for (var i = this.barr.length - 1; i >= 0; i--) {
         if (this.barr[i].tid == tid) {
-            this.barr.splice(i,i);
+            this.barr.splice(i,1);
         }
     }
                 
     for (var i = 0; i < this.tarr.length; i++) {
         if (this.tarr[j].id == tid) {
             this.tarr[j].removeNode();
-            this.tarr.splice (j, j);
+            this.tarr.splice (j, 1);
         }
     }
 };
@@ -89,6 +89,10 @@ Scene.prototype.deselect = function () {
     for (var i = 0; i < this.oarr.length; i++) {
         this.oarr[i].deselect();
     }    
+    
+    for (i = 0; i < this.tarr.length; i++) {
+        this.tarr[i].deselect();
+    }    
 };
     
 Scene.prototype.pressObject = function (evt) {
@@ -106,6 +110,9 @@ Scene.prototype.pressObject = function (evt) {
                 this.draggingObject.updateNode();
                 this.draggingObject.select();
                 this.selectedObject = this.oarr[i];
+                if (t) {
+                    t.select();
+                }
                 break;
             }
         }
@@ -117,8 +124,13 @@ Scene.prototype.pressObject = function (evt) {
                 this.draggingObject =  this.tarr[i];
                 this.selectedObject = this.tarr[i];
                 this.draggingObject.select();
+                break;
             }
         }
+    }
+    
+    if (!this.draggingObject) {
+        return;
     }
     
     for (i = 0; i < this.tarr.length; i++) {
@@ -598,26 +610,51 @@ Scene.prototype.deleteSelection = function() {
         }
     }
     
-    var rt = [];
-    
+    var tidSet = new HashSet();
+
     for (i = 0; i < this.tarr.length; i++) {
-        if (idSet.contains(this.tarr[i].id)) {
-            rt.push(i);
-        } else if (this.tarr[i].selection) {
+        if (this.tarr[i].selection) {
+            tidSet.add(this.tarr[i].id);
+        }
+    }
+    
+    var rb = [];
+    
+    for (i = 0; i < this.barr.length; i++) {
+        if (idSet.contains(this.barr[i].oid)) {
+            tidSet.add(this.barr[i].tid);
+        }
+    }
+
+    var rt = [];
+    for (i = 0; i < this.tarr.length; i++) {
+        if (tidSet.contains(this.tarr[i].id)) {
             rt.push(i);
         }
     }
-      
+    
+    for (i = 0; i < this.barr.length; i++) {
+        if (tidSet.contains(this.barr[i].tid) || 
+            idSet.contains(this.barr[i].oid)) 
+        {
+            rb.push(i);
+        }
+    }
+
     this.deselect();
     for (i = r.length - 1; i >= 0; i--) {
         this.oarr[r[i]].removeNode();
         Project.getProject().deleteElement(this.oarr[r[i]].id);
-        this.oarr.splice (r[i], r[i]);
+        this.oarr.splice (r[i], 1);
     }
     
     for (i = rt.length - 1; i >= 0; i--) {
         this.tarr[rt[i]].removeNode();
         Project.getProject().deleteElement(this.tarr[rt[i]].id);
-        this.tarr.splice (rt[i], rt[i]);        
+        this.tarr.splice (rt[i], 1);        
+    }
+    
+    for (i = rb.length - 1; i >= 0; i--) {
+        this.barr.splice (rb[i], 1);
     }
 };

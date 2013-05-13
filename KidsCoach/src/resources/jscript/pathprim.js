@@ -104,7 +104,6 @@ PathPrim.prototype.addControlPoint = function(grp, x, y) {
 };
 
 PathPrim.prototype.cover = function (targ) {
-    show_status("this.x=" + this.x0);
     return Math.abs(this.x + (this.x0 + this.x1)*0.5 - 
                     targ.x - targ.w*0.5) < cover_prec &&
            Math.abs(this.y + (this.y0 + this.y1)*0.5 -

@@ -1362,6 +1362,22 @@ public class Project implements DropTargetListener, ActionListener {
         return null;
    }
    
+   public Element lookupElementByAttr(Node root, String attr, String val) 
+   {
+       for (Node obj = root.getFirstChild(); obj != null; 
+           obj = obj.getNextSibling()) 
+        {
+            if (obj instanceof Element)  {
+                Element el = (Element)obj;
+                if (el.getAttribute(attr).equals(val)) 
+                {
+                    return el;
+                }
+            }
+        }
+        return null;
+   }
+   
    public int changeText(String id, float x, float y, String txt, String size, 
                          String color) 
    {
@@ -1611,18 +1627,28 @@ public class Project implements DropTargetListener, ActionListener {
         Element slide = getSlide(curSlideId);
       
         Element objs = lookupElement(slide, "objects");
-        if (objs != null) {
-            Element e = lookupElement(objs, Integer.parseInt(id));
-            if (e != null) {
-                e.getParentNode().removeChild(e);
+        Element bnds = lookupElement(slide, "bindings");
+        assert(objs != null);
+        assert(bnds != null);
+        
+        Element e = lookupElement(objs, Integer.parseInt(id));
+        if (e != null) {
+            e.getParentNode().removeChild(e);            
+            Element b = lookupElementByAttr(bnds, "oid", id);
+            if (b != null) {
+                b.getParentNode().removeChild(b);
             }
         }
+
         
         Element targs = lookupElement(slide, "targets");
-        if (objs != null) {
-            Element e = lookupElement(targs, Integer.parseInt(id));
-            if (e != null) {
-                e.getParentNode().removeChild(e);
+        assert(targs != null);
+        e = lookupElement(targs, Integer.parseInt(id));
+        if (e != null) {
+            e.getParentNode().removeChild(e);
+            Element b = lookupElementByAttr(bnds, "tid", id);
+            if (b != null) {
+                b.getParentNode().removeChild(b);
             }
         }
     }

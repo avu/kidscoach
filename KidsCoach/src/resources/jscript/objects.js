@@ -57,7 +57,7 @@ GObj.prototype.select = function() {
         if (this.type != "target") {
             Project.getProject().selectObject("objects", "object", this.id);
         } else {
-            Project.getProject().selectObject("targets", "target", this.id);            
+            Project.getProject().selectObject("targets", "target", this.id);
         }
         
         this.selection = document.createElementNS(svgNS,"rect");
@@ -76,7 +76,7 @@ GObj.prototype.select = function() {
       
         this.node.appendChild(this.selection);
         
-        if (mode != mode_show) {     
+        if (mode != mode_show && this.type != "target") {     
             this.resizeNode = document.createElementNS(svgNS,"rect");
             this.resizeNode.setAttributeNS(null,"id", "resize");	      
             this.resizeNode.setAttributeNS(null,"width",10);	
@@ -128,6 +128,10 @@ GObj.prototype.removeNode = function() {
 GObj.prototype.updateNode = function() {
     this.removeNode();
     this.createNode();
+    if (this.selection) {
+        this.selection = null;
+        this.select();
+    } 
 };
 
 GObj.prototype.addDragProp = function(grp) {
@@ -317,10 +321,6 @@ Target.prototype.removeNode = function() {
     }
 };
 
-Target.prototype.updateNode = function() {
-    this.removeNode();
-    this.createNode();
-};
     
 SObj.prototype.contains = function (targ) {
     return this.x < targ.x && (this.x + this.w) > (targ.x + targ.w) &&

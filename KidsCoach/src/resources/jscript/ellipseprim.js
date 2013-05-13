@@ -94,7 +94,6 @@ EllipsePrim.prototype.select = function() {
 };
 
 EllipsePrim.prototype.cover = function (targ) {
-    show_status(Math.abs(this.x - targ.x - targ.w*0.5) + "," + Math.abs(this.y - targ.y - targ.h*0.5));
     return Math.abs(this.x - targ.x - targ.w*0.5) < cover_prec &&
     Math.abs(this.y - targ.y - targ.h*0.5) < cover_prec;
 };

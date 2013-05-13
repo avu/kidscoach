@@ -78,7 +78,7 @@ function mouseDownCP(evt,num) {
 }
 
 function create_target(id, x, y) {
-    scn.addTarget(id, x - 60, y - 60, 120, 120);
+    scn.addTarget(id, x - 30, y - 30, 60, 60);
 }
 
 function create_line(id, x1, y1, x2, y2, w, c) {
@@ -149,7 +149,7 @@ function mouseDownScene(evt) {
             targ.createNode();  
         } else {
             var tid = Project.getProject().addTarget(sobj.id, p.x, p.y);
-            scn.addTarget(tid, p.x - 60, p.y - 60, 120, 120);
+            scn.addTarget(tid, p.x - 30, p.y - 30, 60, 60);
             scn.bindTarget(tid, sobj.id);
         }
     } else if (tool == tool_new_line) {

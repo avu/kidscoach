@@ -265,7 +265,7 @@ public class Project implements DropTargetListener, ActionListener {
     
     final JPopupMenu getObjectEditPopup(String type) {
         objectEditPopup = new JPopupMenu();
-        if (!"image".equals(type)) {
+        if (!"image".equals(type) && !"target".equals(type)) {
             JMenuItem item = new JMenuItem("Цвет");
             item.addActionListener(this);
             item.setActionCommand("Color");

@@ -129,8 +129,7 @@ Scene.prototype.pressObject = function (evt) {
         importPackage(Packages.kidscoach);
         Project.getProject().popupMenu(
             evt.clientX, evt.clientY, this.draggingObject.id, 
-            this.draggingObject.type);
-            
+            this.draggingObject.type);            
     } else {
         var p = document.documentElement.createSVGPoint();
         p.x = evt.clientX;
@@ -604,6 +603,8 @@ Scene.prototype.deleteSelection = function() {
     for (i = 0; i < this.tarr.length; i++) {
         if (idSet.contains(this.tarr[i].id)) {
             rt.push(i);
+        } else if (this.tarr[i].selection) {
+            rt.push(i);
         }
     }
       
@@ -616,6 +617,7 @@ Scene.prototype.deleteSelection = function() {
     
     for (i = rt.length - 1; i >= 0; i--) {
         this.tarr[rt[i]].removeNode();
+        Project.getProject().deleteElement(this.tarr[rt[i]].id);
         this.tarr.splice (rt[i], rt[i]);        
     }
 };

@@ -138,7 +138,7 @@ function mouseDownScene(evt) {
     p = p.matrixTransform(m.inverse());
              
     importPackage(Packages.kidscoach);
-    if(mode == mode_edit && sobj && tool == tool_select)
+    if(mode == mode_edit && sobj && tool == tool_select && sobj.type != gobj_type_target)
     {    
         var targ = scn.getTargetForObject(sobj.id);
         if (targ) {

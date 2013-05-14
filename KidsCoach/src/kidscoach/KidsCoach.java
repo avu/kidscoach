@@ -126,9 +126,29 @@ public class KidsCoach extends JFrame implements ActionListener {
             fc.showOpenDialog(fc);
             File file = fc.getSelectedFile();
             if (file != null) {
-                if (!prj.addResource(file.getAbsolutePath())) {
+                if (!prj.addResourceToApp(file.getAbsolutePath())) {
                     JOptionPane.showMessageDialog(
                             this, "Ошибка добавления ресурса");
+                }
+            }
+        } else if ("AddPicture".equals(e.getActionCommand())) {
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Images", "svg", "jpeg", "jpg", "png", "bmp", "gif");
+            
+            JFileChooser fc = new JFileChooser(new File(""));
+            fc.setFileFilter(filter);
+
+            fc.showOpenDialog(fc);
+            File file = fc.getSelectedFile();
+            if (file != null) {
+                if (!prj.addResource(file.getAbsolutePath())) {
+                    JOptionPane.showMessageDialog(
+                            this, "Ошибка добавления картинки");
+                } else if (!prj.addFileToSlide(file.getAbsolutePath(), 
+                                               file.getName(), 400, 300)) 
+                {
+                    JOptionPane.showMessageDialog(
+                            this, "Ошибка добавления картинки");
                 }
             }
         } else if ("NewLine".equals(e.getActionCommand())) {
@@ -231,7 +251,7 @@ public class KidsCoach extends JFrame implements ActionListener {
             {"NewSlide", "s32/window-new.png", "Новый Слайд"},
             {"OpenProject", "s32/document-open.png", "Открыть Проект"},
             {"SaveProject", "s32/document-save.png", "Сохранить Проект"},
-            {"AddResource", "s32/image-x-generic.png", "Добавить ресурс"},
+            {"AddPicture", "s32/image-x-generic.png", "Добавить картинку"},
         });
         
         trmBar = new ToolBar(this, new String[][] {

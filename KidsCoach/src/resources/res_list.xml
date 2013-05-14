@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <system>
+        <file from="resources/prj_tpl.xml" to="prj.xml" />
+        <file from="resources/svg/scene.svg" to="scene.svg" />
+        <file from="resources/jscript/common.js" to="common.js" />
+        <file from="resources/jscript/objects.js" to="objects.js" />
+        <file from="resources/jscript/lineprim.js" to="lineprim.js" />
+        <file from="resources/jscript/ellipseprim.js" to="ellipseprim.js" />
+        <file from="resources/jscript/rectprim.js" to="rectprim.js" />
+        <file from="resources/jscript/pathprim.js" to="pathprim.js" />
+        <file from="resources/jscript/textprim.js" to="textprim.js" />
+        <file from="resources/jscript/scene.js" to="scene.js" />
+        <file from="resources/jscript/bridge.js" to="bridge.js" />
+        <file from="resources/jscript/jshashset.js" to="jshashset.js" />
+        <file from="resources/jscript/jshashtable.js" to="jshashtable.js" />
+        <file from="resources/svg/face.svg" to="face.svg" />
+        <file from="resources/svg/targ.svg" to="targ.svg" />
+        <file from="resources/image/EmptySlide.png" to="slide0.png" />
+    </system>
+    <user>
+        <file from="resources/svg/face.svg" to="face.svg" />
+    </user>    
+</root>

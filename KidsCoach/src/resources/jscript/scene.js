@@ -4,6 +4,7 @@ function Scene() {
     this.barr = new Array();
     this.draggingObject = null;
     this.selectedObject = null;
+    this.prevSelectedObject = null;
     this.isResize = false;
     this.movecp = false;
     this.curCPNum = -1;
@@ -350,6 +351,11 @@ Scene.prototype.endNewLine = function(p) {
         this.constrPrim.editMode = false;
         this.constrPrim.updateNode();
         this.constrPrim = null;
+        if (this.prevSelectedObject) { 
+            setTargetForObject(this.prevSelectedObject,p);
+            this.prevSelectedObject = null;
+        }
+
         return;
     }
     
@@ -365,6 +371,7 @@ Scene.prototype.endNewLine = function(p) {
     this.constrPrim.coords[3] = p.y - this.constrPrim.y;
     this.constrPrim.updateNode();
     this.constrPrim.select();
+    this.selectedObject = this.constrPrim;
     this.oarr.push(this.constrPrim);
     this.constrPrim = null;
 };
@@ -390,6 +397,10 @@ Scene.prototype.endNewEllipse = function(p) {
         this.constrPrim.editMode = false;
         this.constrPrim.updateNode();
         this.constrPrim = null;
+        if (this.prevSelectedObject) { 
+            setTargetForObject(this.prevSelectedObject,p);
+            this.prevSelectedObject = null;
+        }
         return;
     }
     
@@ -430,6 +441,11 @@ Scene.prototype.endNewRect = function(p) {
         this.constrPrim.editMode = false;
         this.constrPrim.updateNode();
         this.constrPrim = null;
+        if (this.prevSelectedObject) { 
+            setTargetForObject(this.prevSelectedObject,p);
+            this.prevSelectedObject = null;
+        }
+
         return;
     }
     

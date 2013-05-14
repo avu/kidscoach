@@ -47,12 +47,7 @@ function bind_target(tid, oid) {
 }
     
 function add_object(oid, name, x, y, w, h) {
-    var p = document.documentElement.createSVGPoint();
-    p.x = x;
-    p.y = y;
-    var m = getScreenCTM(document.documentElement);
-    p = p.matrixTransform(m.inverse());
-    scn.addObject(oid, name, p.x-w/2.0, p.y-h/2.0, w, h);
+    scn.addObject(oid, name, x-w/2.0, y-h/2.0, w, h);
 }
     
 function set_mode(m) {
@@ -128,8 +123,24 @@ function change_prim_color(id, c) {
     scn.changePrimColor(id, c);    
 }
 
+function setTargetForObject(sobj,p) {
+    var targ = scn.getTargetForObject(sobj.id);
+    if (targ) {
+        Project.getProject().changeTarget(targ.id, p.x, p.y);
+        targ.x = p.x - 30;
+        targ.y = p.y - 30;
+        targ.removeNode();
+        targ.createNode();
+    } else {
+        var tid = Project.getProject().addTarget(sobj.id, p.x, p.y);
+        scn.addTarget(tid, p.x - 30, p.y - 30, 60, 60);
+        scn.bindTarget(tid, sobj.id);
+    }
+}
+
 function mouseDownScene(evt) {
     var sobj = scn.getSelectedObject();
+    scn.prevSelectedObject = sobj;
     var p = document.documentElement.createSVGPoint();
     p.x = evt.clientX;
     p.y = evt.clientY;
@@ -140,18 +151,7 @@ function mouseDownScene(evt) {
     importPackage(Packages.kidscoach);
     if(mode == mode_edit && sobj && tool == tool_select && sobj.type != gobj_type_target)
     {    
-        var targ = scn.getTargetForObject(sobj.id);
-        if (targ) {
-            Project.getProject().changeTarget(targ.id, p.x, p.y);
-            targ.x = p.x - 60;
-            targ.y = p.y - 60;
-            targ.removeNode();
-            targ.createNode();  
-        } else {
-            var tid = Project.getProject().addTarget(sobj.id, p.x, p.y);
-            scn.addTarget(tid, p.x - 30, p.y - 30, 60, 60);
-            scn.bindTarget(tid, sobj.id);
-        }
+        setTargetForObject(sobj,p);
     } else if (tool == tool_new_line) {
         scn.startNewLine(p);
     } else if (tool == tool_new_ellipse) {

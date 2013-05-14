@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -60,6 +63,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.apache.batik.bridge.UpdateManagerAdapter;
 import org.apache.batik.bridge.UpdateManagerEvent;
+import org.apache.batik.ext.swing.GridBagConstants;
 import org.apache.batik.gvt.event.SelectionAdapter;
 import org.apache.batik.gvt.event.SelectionEvent;
 import org.apache.batik.gvt.event.SelectionListener;
@@ -95,6 +99,7 @@ public class Project implements DropTargetListener, ActionListener {
     SlidePanel slidePanel;
     JLabel statusLine;
     Document prj;
+    Document resList;
     String prjName = DEFAULT_NAME;
     Path tempDir;
     int objCount;
@@ -132,6 +137,10 @@ public class Project implements DropTargetListener, ActionListener {
         return statusLine;
     }
     
+    void changeWindowSize(int width, int height) {
+        canvas.executeScript("document.documentElement.setAttribute(\"width\"," + width + ");" +
+                             "document.documentElement.setAttribute(\"height\"," + height + ");");        
+    }
     void newLineToolEnable() {
         canvas.executeScript("set_tool(\"new_line\")");
     }
@@ -595,7 +604,20 @@ public class Project implements DropTargetListener, ActionListener {
         }
     }
 
-    boolean addResource(String name) {
+    boolean addResourceToApp(String name) {
+        try {
+            Path rp = FileSystems.getDefault().getPath(name);
+            installResourceToApp(rp.toString(), rp.getFileName().toString());
+
+        } catch (IOException ex) {
+            Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        resourcePanel.getTableModel().initFromDir(tempDir.resolve("resource").toString());
+        return true;
+    }
+    
+        boolean addResource(String name) {
         try {
             Path rp = FileSystems.getDefault().getPath(name);
             installResource(rp.toString(), rp.getFileName().toString());
@@ -607,6 +629,7 @@ public class Project implements DropTargetListener, ActionListener {
         resourcePanel.getTableModel().initFromDir(tempDir.resolve("resource").toString());
         return true;
     }
+
     
     private boolean load() {
         if (tempDir == null) {
@@ -714,7 +737,7 @@ public class Project implements DropTargetListener, ActionListener {
         return true;
     }
     
-    private boolean showCurrentSlide() {
+    private boolean showCurrentSlide(final int w, final int h) {
         String scenePath = FileSystems.getDefault().getPath(tempDir.toString(), 
                                                         "scene.svg").toString();
         
@@ -747,6 +770,7 @@ public class Project implements DropTargetListener, ActionListener {
                 });
 //
                 showModeEnable();
+                changeWindowSize(w, h);
                 clearScene();
                 Element s = getSlide(curSlideId);
                 if (s != null) {
@@ -867,6 +891,18 @@ public class Project implements DropTargetListener, ActionListener {
         Files.copy(FileSystems.getDefault().getPath(resName),
                    FileSystems.getDefault().getPath(tempDir.toString(),to));
     }
+    
+    boolean installExtFile(String from, String to) {
+        try {
+            Files.copy(FileSystems.getDefault().getPath(from),
+                    FileSystems.getDefault().getPath(tempDir.toString()+"/resource", to),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            log.log(Level.SEVERE, null, e);
+            return false;
+        }
+        return true;
+    }
 
     void installResourceFromBundle(String from, String to) throws IOException {
         String resName = null;
@@ -887,7 +923,125 @@ public class Project implements DropTargetListener, ActionListener {
         Files.copy(FileSystems.getDefault().getPath(resName),
                    FileSystems.getDefault().getPath(tempDir.toString(),"resource").resolve(to));
     }
+        
+    void installResourceToApp(String from, String to) throws IOException {
+        String resName = new File(from).getPath();
+        
+        Files.copy(FileSystems.getDefault().getPath(resName),
+                   FileSystems.getDefault().getPath(tempDir.toString(),"resource").resolve(to));
+        
+        String usrPath = null;
+        
+        try {
+            usrPath = (new File(ClassLoader.getSystemClassLoader().
+                    getResource("user").toURI())).getPath();
+        } catch (URISyntaxException ex) {
+            log.log(Level.SEVERE, null, ex);
+        }
+        
+        Files.copy(FileSystems.getDefault().getPath(resName),
+            FileSystems.getDefault().getPath(usrPath).resolve(to));
+        
+        Element usr = lookupElement(resList.getFirstChild(), "user");
+        assert(usr != null);
+        Element f = resList.createElement("file");
+        f.setAttribute("from", "user/" + to);
+        f.setAttribute("to", to);
+        usr.appendChild(f);
+        
+        try {
+            Transformer t = TransformerFactory.newInstance().newTransformer();
+            
+            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            t.setOutputProperty(OutputKeys.METHOD, "xml");
+            t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", 
+                                "2");
+            
+            File cfgFile = new File(ClassLoader.getSystemClassLoader().
+                    getResource("resources/res_list.xml").toURI());
+            t.transform(new DOMSource(resList), 
+                new StreamResult(
+                    new FileOutputStream(cfgFile)));
+        } catch (FileNotFoundException ex) {
+            log.log(Level.SEVERE, null, ex);
+        } catch (TransformerException ex) {
+            log.log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            log.log(Level.SEVERE, null, ex);
+        }
+    }
 
+    
+    boolean loadResList() {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            
+            File f = new File(ClassLoader.getSystemClassLoader().
+                    getResource("resources/res_list.xml").toURI());
+            resList = builder.parse(f);
+        } catch (SAXException ex) {
+            log.log(Level.SEVERE, null, ex);
+            return false;
+        } catch (IOException ex) {
+            log.log(Level.SEVERE, null, ex);
+            return false;
+        } catch (ParserConfigurationException ex) {
+            log.log(Level.SEVERE, null, ex);
+            return false;
+        } catch (URISyntaxException ex) {
+            log.log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
+    }
+    
+    boolean installResList() {
+        Element sys = lookupElement(resList.getFirstChild(), "system");
+        assert(sys != null);
+        for (Node n = sys.getFirstChild(); n != null;
+                n = n.getNextSibling()) {
+            if (n instanceof Element) {
+                Element sobj = (Element) n;
+                if (sobj.getTagName().equals("file")) {
+                    final String from =
+                            sobj.getAttribute("from");
+                    final String to =
+                            sobj.getAttribute("to");
+                    try {
+                        installFile(from, to);
+                    } catch (IOException e) {
+                        log.log(Level.SEVERE, null, e);
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        Element usr = lookupElement(resList.getFirstChild(), "user");
+        assert(usr != null);
+        for (Node n = usr.getFirstChild(); n != null;
+                n = n.getNextSibling()) {
+            if (n instanceof Element) {
+                Element sobj = (Element) n;
+                if (sobj.getTagName().equals("file")) {
+                    final String from =
+                            sobj.getAttribute("from");
+                    final String to =
+                            sobj.getAttribute("to");
+                    try {
+                        installResourceFromBundle(from, to);
+                    } catch (IOException e) {
+                        log.log(Level.SEVERE, null, e);
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
     boolean create() {
         if (tempDir == null) {
             log.severe("tempDir is null");
@@ -903,40 +1057,15 @@ public class Project implements DropTargetListener, ActionListener {
                 log.log(Level.SEVERE, null, ex);
             }
         }
-
-        try {
-            installFile("resources/prj_tpl.xml", "prj.xml");
-            installFile("resources/svg/scene.svg", "scene.svg");
-            installFile("resources/jscript/common.js", "common.js");
-            installFile("resources/jscript/objects.js", "objects.js");
-            installFile("resources/jscript/lineprim.js", "lineprim.js");
-            installFile("resources/jscript/ellipseprim.js", "ellipseprim.js");
-            installFile("resources/jscript/rectprim.js", "rectprim.js");
-            installFile("resources/jscript/pathprim.js", "pathprim.js");
-            installFile("resources/jscript/textprim.js", "textprim.js");
-            installFile("resources/jscript/scene.js", "scene.js");
-            installFile("resources/jscript/bridge.js", "bridge.js");
-            installFile("resources/jscript/jshashset.js", "jshashset.js");
-            installFile("resources/jscript/jshashtable.js", "jshashtable.js");
-
-            installFile("resources/svg/face.svg", "face.svg");
-            
-            installResourceFromBundle("resources/svg/face.svg", "face.svg");
-         /*   installResource("resources/svg/ball.svg", "ball.svg");
-            installResource("resources/svg/letter.svg", "letter.svg");
-            installResource("resources/svg/oval.svg", "oval.svg");
-            installResource("resources/svg/square.svg", "square.svg"); */
-
-            installFile("resources/svg/targ.svg", "targ.svg");
-            installFile("resources/image/EmptySlide.png", "slide0.png");
-        } catch (IOException e) {
-            log.log(Level.SEVERE, null, e);
+        
+        if (!loadResList()) {
             return false;
         }
         
-        //getResourcePanel().getTableModel().initFromDir(
-        //        tempDir.resolve("resource").toString());
-        
+        if (!installResList()) {
+            return false;
+        }
+    
         if (load()) 
         {
             prjName = DEFAULT_NAME;
@@ -1109,17 +1238,50 @@ public class Project implements DropTargetListener, ActionListener {
         }
    }
 
+    public boolean addFileToSlide(String from, String to, float x, float y) {
+        canvas.addSVGFile(objCount, to, x, y, 100, 100);
+        Element slide = getSlide(curSlideId);
+        for (Node obj = slide.getFirstChild(); obj != null;
+                obj = obj.getNextSibling()) {
+            if (obj instanceof Element) {
+                Element objsEl = (Element) obj;
+                if (objsEl.getTagName().equals("objects")) {
+                    Element sobj = prj.createElement("object");
+                    sobj.setAttribute("name", to);
+                    sobj.setAttribute("x", Float.toString(x));
+                    sobj.setAttribute("y", Float.toString(y));
+                    sobj.setAttribute("w", "100");
+                    sobj.setAttribute("h", "100");
+                    sobj.setAttribute("id", Integer.toString(objCount));
+                    objsEl.appendChild(sobj);
+                }
+            }
+        }
+
+        Element countEl = lookupElement(prj.getFirstChild(), "count");
+        countEl.setAttribute("value", Integer.toString(objCount + 1));
+
+        objCount++;
+
+        SlideElem se = getSlideElem(curSlideId);
+        BufferedImage img = (BufferedImage) canvas.getSnapshot(50, 50);
+        se.setImage(img);
+        return true;
+    }
+   
    // This method handles a drop for svg file
    private boolean dropSVGFile(Transferable transferable, float x, float y)
                 throws IOException, UnsupportedFlavorException,
                 MalformedURLException {
       String str = (String)transferable.getTransferData(DataFlavor.stringFlavor);
-      log.log(Level.FINE, "Resource file is {0}", str);
+//      log.log(Level.FINE, "Resource file is {0}", str);
       
       String file = null;
       file = tempDir.resolve("resource").resolve(str).toString();
-            
-      Files.copy(FileSystems.getDefault().getPath(file),
+      if (!addFileToSlide(file, str, x, y)) {
+          return false;
+      }      
+/*      Files.copy(FileSystems.getDefault().getPath(file),
                  FileSystems.getDefault().getPath(tempDir.toString(), str), 
                  StandardCopyOption.REPLACE_EXISTING);
       canvas.addSVGFile(objCount, str, x, y, 100, 100);
@@ -1138,17 +1300,18 @@ public class Project implements DropTargetListener, ActionListener {
                   sobj.setAttribute("h", "100");                  
                   sobj.setAttribute("id", Integer.toString(objCount));
                   objsEl.appendChild(sobj);
-              } else if (objsEl.getTagName().equals("count")) {
-                  
-                  objsEl.setAttribute("value", Integer.toString(objCount+1));
               }
           }
       }
+      
+      Element countEl = lookupElement(prj.getFirstChild(), "count");
+      countEl.setAttribute("value", Integer.toString(objCount + 1));
+
       objCount++;
 
       SlideElem se = getSlideElem(curSlideId);
       BufferedImage img = (BufferedImage)canvas.getSnapshot(50, 50);
-      se.setImage(img);
+      se.setImage(img);*/
       return true;
    }
    
@@ -1205,6 +1368,9 @@ public class Project implements DropTargetListener, ActionListener {
               }
           }
       }
+      Element countEl = lookupElement(prj.getFirstChild(), "count");
+      countEl.setAttribute("value", Integer.toString(objCount + 1));
+            
       int res = objCount;
       objCount++;
       return res;
@@ -1231,6 +1397,9 @@ public class Project implements DropTargetListener, ActionListener {
               }
           }
       }
+       
+      Element countEl = lookupElement(prj.getFirstChild(), "count");
+      countEl.setAttribute("value", Integer.toString(objCount + 1));
       int res = objCount;
       objCount++;
       return res;
@@ -1259,6 +1428,10 @@ public class Project implements DropTargetListener, ActionListener {
               }
           }
       }
+       
+      Element countEl = lookupElement(prj.getFirstChild(), "count");
+      countEl.setAttribute("value", Integer.toString(objCount + 1));
+
       int res = objCount;
       objCount++;
       return res; 
@@ -1285,6 +1458,10 @@ public class Project implements DropTargetListener, ActionListener {
               }
           }
       }
+       
+      Element countEl = lookupElement(prj.getFirstChild(), "count");
+      countEl.setAttribute("value", Integer.toString(objCount + 1));
+
       int res = objCount;
       objCount++;
       return res;
@@ -1309,6 +1486,10 @@ public class Project implements DropTargetListener, ActionListener {
               }
           }
       }
+      
+      Element countEl = lookupElement(prj.getFirstChild(), "count");
+      countEl.setAttribute("value", Integer.toString(objCount + 1));
+
       int res = objCount;
       objCount++;
       return res; 
@@ -1678,14 +1859,36 @@ public class Project implements DropTargetListener, ActionListener {
         saveCanvas();
         setCanvas(null);
         playDlg = new JDialog(mainFrame);
+        GridBagLayout gbl = new GridBagLayout();
+        playDlg.getContentPane().setLayout(gbl);
+        
         ToolBar showAnimBar = new ToolBar(this, new String[][] {
             {"Start", "s32/media-playback-start.png", "Запуск"},
             {"Stop", "s32/media-playback-stop.png", "Остановить"}
         });
+
+        GridBagConstraints constr = new GridBagConstraints();
         
-        getCanvas().setPreferredSize(new Dimension(800,600));
-        playDlg.add(getCanvas(), BorderLayout.CENTER);
-        playDlg.add(showAnimBar, BorderLayout.NORTH);
+        constr.weightx = 100;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 0;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.anchor = GridBagConstants.NORTH;
+        playDlg.add(showAnimBar, constr);
+
+        constr = new GridBagConstraints();
+        
+        constr.weightx = 100;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 1;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        
+        
+        playDlg.add(getCanvas(), constr);
 
         //playDlg.pack();
         playDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -1698,22 +1901,32 @@ public class Project implements DropTargetListener, ActionListener {
             }
         });
                 
-        showCurrentSlide();
         
         GraphicsDevice gd =
             GraphicsEnvironment.getLocalGraphicsEnvironment().
                 getDefaultScreenDevice();
 
-        // boolean isFullScreen = false;
+        //boolean isFullScreen = false;
         boolean isFullScreen = gd.isFullScreenSupported();
 
         if (isFullScreen) {
+            int w = ((gd.getDisplayMode().getHeight() - 50)* 800)/600;
+            int h = gd.getDisplayMode().getHeight() - 50;
+            showCurrentSlide(w, h);
+
+            getCanvas().setPreferredSize(
+                    new Dimension(w, h));
+
+
             playDlg.setUndecorated(true);
             playDlg.setResizable(false);
             playDlg.validate();
             gd.setFullScreenWindow(playDlg);
             playDlg.setVisible(true);
+
         } else {
+            getCanvas().setPreferredSize(new Dimension(800,600));
+            showCurrentSlide(800, 600);
             playDlg.setModal(true);
             playDlg.pack();
             playDlg.setVisible(true);

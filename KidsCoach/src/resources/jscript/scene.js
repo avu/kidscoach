@@ -168,6 +168,24 @@ Scene.prototype.changePrimColor = function(id, c) {
     }
 };
 
+Scene.prototype.changePrimText = function(id, txt) {
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].id == id) {
+            this.oarr[i].setText(txt);
+        }
+    }
+};
+
+Scene.prototype.getPrimText = function(id) {
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].id == id) {
+            return this.oarr[i].getText();
+        }
+    }
+    return "";
+};
+
+
 Scene.prototype.endDrag = function () {
     this.draggingObject = null;
 };
@@ -199,7 +217,7 @@ Scene.prototype.getDraggingObject = function () {
 Scene.prototype.getSelectedObject = function () {
     return this.selectedObject;
 };
-    
+
 Scene.prototype.bindTarget = function (tid, oid) {
     this.barr.push(new Binding(tid, oid));
     for (var i = 0; i < this.tarr.length; i++) {

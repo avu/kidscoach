@@ -9,6 +9,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.script.Interpreter;
@@ -55,18 +59,19 @@ public class SCanvas extends JSVGCanvas {
     }
     
     Object executeScript(final String src) {
-        final UpdateManager um = getUpdateManager(); 
+        final UpdateManager um = getUpdateManager();
+
+        final Object[] res = new Object[1];
         um.getUpdateRunnableQueue().invokeLater(
-            new Runnable() {
-                
-                @Override
-                public void run() {
-                    Interpreter inter = um.getBridgeContext().getInterpreter("text/ecmascript");
-                    Object evaluate = inter.evaluate(src);
-                }
+                new Runnable() {
+            @Override
+            public void run() {
+                Interpreter inter = um.getBridgeContext().getInterpreter("text/ecmascript");
+                res[0] = inter.evaluate(src);
+            }
         });
-        
-        return null;
+
+        return res[0];
     }
     
 }

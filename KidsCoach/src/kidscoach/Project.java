@@ -7,6 +7,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -43,12 +44,14 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
@@ -177,6 +180,11 @@ public class Project implements DropTargetListener, ActionListener {
     void changePrimColor(String pid, String rgb) {
         canvas.executeScript("change_prim_color(" + pid + ", \"" + rgb + "\")");        
     }
+    
+    void changePrimText(String pid, String txt) {
+        canvas.executeScript("change_prim_text(" + pid + ", \"" + txt + "\")");        
+    }    
+
 
     void deleteSelection() {
         canvas.executeScript("delete_selection()");        
@@ -214,6 +222,72 @@ public class Project implements DropTargetListener, ActionListener {
                              ",\"" + txt + "\",\""  + size +  "\",\"" + color + "\")");
     }
 
+    public void showEditTextDlg() {
+        final JDialog editDlg = new JDialog(KidsCoach.mainFrame);
+        GridBagLayout gbl = new GridBagLayout();
+        editDlg.getContentPane().setLayout(gbl);
+        
+        GridBagConstraints constr = new GridBagConstraints();
+        final JTextField fld = new JTextField();
+        fld.setText(getPrimText(Integer.toString(selectedObject)));
+        constr.weightx = 100;
+        constr.weighty = 100;
+        constr.gridx = 0;
+        constr.gridy = 0;
+        constr.gridwidth = 2;
+        constr.gridheight = 1;
+        constr.anchor = GridBagConstants.NORTH;
+        constr.fill = GridBagConstants.HORIZONTAL;
+        constr.insets = new Insets(40, 20, 0, 20);
+        editDlg.add(fld, constr);
+
+        constr = new GridBagConstraints();
+        final JButton okBtn = new JButton("Изменить");
+        constr.weightx = 100;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 1;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+        
+        okBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                changePrimText(Integer.toString(selectedObject), fld.getText());
+                editDlg.setVisible(false);
+                editDlg.dispose();
+            }
+        });
+
+        editDlg.add(okBtn, constr);
+        editDlg.getRootPane().setDefaultButton(okBtn);
+
+        constr = new GridBagConstraints();
+        JButton cancelBtn = new JButton("Отмена");
+        constr.weightx = 100;
+        constr.weighty = 0;
+        constr.gridx = 1;
+        constr.gridy = 1;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+
+
+        cancelBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                editDlg.setVisible(false);
+                editDlg.dispose();
+            }
+        });
+        
+        editDlg.add(cancelBtn, constr);
+
+        editDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        editDlg.setTitle("Изменение текста");
+        editDlg.setPreferredSize(new Dimension(320, 180));
+        editDlg.pack();
+        editDlg.setVisible(true);
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         if ("Delete".equals(e.getActionCommand())) {
@@ -222,6 +296,8 @@ public class Project implements DropTargetListener, ActionListener {
             Color pColor = JColorChooser.showDialog(getCanvas(),
                                  "Выберите цвет", Color.BLACK);
             changePrimColor(Integer.toString(selectedObject), pColor);
+        } else if ("Edit".equals(e.getActionCommand())) {
+            showEditTextDlg();
         } else if ("Stop".equals(e.getActionCommand())) {
             playDlg.setVisible(false);
             restoreCanvas();
@@ -278,6 +354,12 @@ public class Project implements DropTargetListener, ActionListener {
             JMenuItem item = new JMenuItem("Цвет");
             item.addActionListener(this);
             item.setActionCommand("Color");
+            objectEditPopup.add(item);
+        }
+        if ("text".equals(type)) {
+            JMenuItem item = new JMenuItem("Изменить");
+            item.addActionListener(this);
+            item.setActionCommand("Edit");
             objectEditPopup.add(item);
         }
 
@@ -1281,37 +1363,7 @@ public class Project implements DropTargetListener, ActionListener {
       if (!addFileToSlide(file, str, x, y)) {
           return false;
       }      
-/*      Files.copy(FileSystems.getDefault().getPath(file),
-                 FileSystems.getDefault().getPath(tempDir.toString(), str), 
-                 StandardCopyOption.REPLACE_EXISTING);
-      canvas.addSVGFile(objCount, str, x, y, 100, 100);
-      Element slide = getSlide(curSlideId);
-      for (Node obj = slide.getFirstChild(); obj != null; 
-           obj = obj.getNextSibling()) 
-      {
-          if (obj instanceof Element)  {
-              Element objsEl = (Element)obj;
-              if (objsEl.getTagName().equals("objects")) {
-                  Element sobj = prj.createElement("object");
-                  sobj.setAttribute("name", str);
-                  sobj.setAttribute("x", Float.toString(x));
-                  sobj.setAttribute("y", Float.toString(y));
-                  sobj.setAttribute("w", "100");
-                  sobj.setAttribute("h", "100");                  
-                  sobj.setAttribute("id", Integer.toString(objCount));
-                  objsEl.appendChild(sobj);
-              }
-          }
-      }
-      
-      Element countEl = lookupElement(prj.getFirstChild(), "count");
-      countEl.setAttribute("value", Integer.toString(objCount + 1));
 
-      objCount++;
-
-      SlideElem se = getSlideElem(curSlideId);
-      BufferedImage img = (BufferedImage)canvas.getSnapshot(50, 50);
-      se.setImage(img);*/
       return true;
    }
    
@@ -1619,6 +1671,16 @@ public class Project implements DropTargetListener, ActionListener {
        return 0;
    }
    
+   String getPrimText(String pid) {
+       Element slide = getSlide(curSlideId);
+       Element objects = lookupElement(slide, "objects");
+       if (objects != null) {
+           Element gobj = lookupElement(objects, "text", pid);
+           return gobj.getAttribute("text");
+       }
+       return null;
+   }    
+
    public int changeLine(String id, float x0, float y0, float x1, float y1, 
                          float w, String color) 
    {

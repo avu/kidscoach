@@ -92,3 +92,19 @@ TextPrim.prototype.setColor = function(c) {
         list.item(0).setAttributeNS(null,"fill", this.data[2]);
     }
 };
+
+TextPrim.prototype.setText = function(txt) {
+    this.data[0] = txt;
+    if (this.node) {
+        var list = this.node.getElementsByTagName("text");
+        var p = list.item(0);
+        var vo = p.firstChild;
+        p.removeChild(vo);
+        var v = document.createTextNode(this.data[0]);
+        p.appendChild(v);
+    }
+};
+
+TextPrim.prototype.getText = function(txt) {
+    return this.data[0];
+};

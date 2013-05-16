@@ -123,6 +123,10 @@ function change_prim_color(id, c) {
     scn.changePrimColor(id, c);    
 }
 
+function change_prim_text(id, txt) {
+    return scn.changePrimText(id, txt);
+}
+
 function setTargetForObject(sobj,p) {
     var targ = scn.getTargetForObject(sobj.id);
     if (targ) {

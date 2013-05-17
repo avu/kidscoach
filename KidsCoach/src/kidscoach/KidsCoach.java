@@ -50,6 +50,8 @@ public class KidsCoach extends JFrame implements ActionListener {
     
     private int mode = EDIT_MODE;
     
+    private String currentPath = "";
+    
     public int getMode() {
         return mode;
     }
@@ -120,7 +122,7 @@ public class KidsCoach extends JFrame implements ActionListener {
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "Images", "svg", "jpeg", "jpg", "png", "bmp", "gif");
             
-            JFileChooser fc = new JFileChooser(new File(""));
+            JFileChooser fc = new JFileChooser(new File(currentPath));
             fc.setFileFilter(filter);
 
             fc.showOpenDialog(fc);
@@ -129,13 +131,16 @@ public class KidsCoach extends JFrame implements ActionListener {
                 if (!prj.addResourceToApp(file.getAbsolutePath())) {
                     JOptionPane.showMessageDialog(
                             this, "Ошибка добавления ресурса");
+                } else {
+                    currentPath = file.getParent();
+                    if (currentPath == null) currentPath = "";
                 }
             }
         } else if ("AddPicture".equals(e.getActionCommand())) {
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "Images", "svg", "jpeg", "jpg", "png", "bmp", "gif");
             
-            JFileChooser fc = new JFileChooser(new File(""));
+            JFileChooser fc = new JFileChooser(new File(currentPath));
             fc.setFileFilter(filter);
 
             fc.showOpenDialog(fc);
@@ -149,6 +154,9 @@ public class KidsCoach extends JFrame implements ActionListener {
                 {
                     JOptionPane.showMessageDialog(
                             this, "Ошибка добавления картинки");
+                } else {
+                    currentPath = file.getParent();
+                    if (currentPath == null) currentPath = "";
                 }
             }
         } else if ("NewLine".equals(e.getActionCommand())) {

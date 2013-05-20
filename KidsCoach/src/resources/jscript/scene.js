@@ -125,6 +125,10 @@ Scene.prototype.pressObject = function (evt) {
                 this.draggingObject =  this.tarr[i];
                 this.selectedObject = this.tarr[i];
                 this.draggingObject.select();
+                var o = this.getObjectForTarget(this.tarr[i].id);
+                if (o) {
+                    o.select();
+                }
                 break;
             }
         }
@@ -202,7 +206,20 @@ Scene.prototype.getTargetForObject = function (id) {
     }
     return null;
 };
-    
+
+Scene.prototype.getObjectForTarget = function (id) {
+    for (var i = 0; i < this.barr.length; i++) {
+        if (this.barr[i].tid == id) {
+            for (var j = 0; j < this.oarr.length; j++) {
+                if (this.oarr[j].id == this.barr[i].oid) {
+                    return this.oarr[j];
+                }
+            }
+        }
+    }
+    return null;
+};
+
 Scene.prototype.completeTargets = function () {
     for (var i = 0; i < this.tarr.length; i++) {
         if (!this.tarr[i].done) return false;
@@ -648,6 +665,70 @@ Scene.prototype.deleteSelection = function() {
 
     for (i = 0; i < this.tarr.length; i++) {
         if (this.tarr[i].selection) {
+            tidSet.add(this.tarr[i].id);
+        }
+    }
+    
+    var rb = [];
+    
+    for (i = 0; i < this.barr.length; i++) {
+        if (idSet.contains(this.barr[i].oid)) {
+            tidSet.add(this.barr[i].tid);
+        }
+    }
+
+    var rt = [];
+    for (i = 0; i < this.tarr.length; i++) {
+        if (tidSet.contains(this.tarr[i].id)) {
+            rt.push(i);
+        }
+    }
+    
+    for (i = 0; i < this.barr.length; i++) {
+        if (tidSet.contains(this.barr[i].tid) || 
+            idSet.contains(this.barr[i].oid)) 
+        {
+            rb.push(i);
+        }
+    }
+
+    this.deselect();
+    for (i = r.length - 1; i >= 0; i--) {
+        this.oarr[r[i]].removeNode();
+        Project.getProject().deleteElement(this.oarr[r[i]].id);
+        this.oarr.splice (r[i], 1);
+    }
+    
+    for (i = rt.length - 1; i >= 0; i--) {
+        this.tarr[rt[i]].removeNode();
+        Project.getProject().deleteElement(this.tarr[rt[i]].id);
+        this.tarr.splice (rt[i], 1);        
+    }
+    
+    for (i = rb.length - 1; i >= 0; i--) {
+        this.barr.splice (rb[i], 1);
+    }
+};
+
+Scene.prototype.deleteElement = function(id) {
+    if (mode != mode_edit) {
+        return;
+    }
+    
+    importPackage(Packages.kidscoach);
+    var r = [];
+    var idSet = new HashSet();
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].id == id) {
+            r.push(i);
+            idSet.add(this.oarr[i].id);
+        }
+    }
+    
+    var tidSet = new HashSet();
+
+    for (i = 0; i < this.tarr.length; i++) {
+        if (this.tarr[i].id == id) {
             tidSet.add(this.tarr[i].id);
         }
     }

@@ -190,6 +190,10 @@ public class Project implements DropTargetListener, ActionListener {
         canvas.executeScript("delete_selection()");        
     }
     
+    void deleteElement(int id) {
+        canvas.executeScript("delete_element(\"" + id + "\")");
+    }
+    
     private void createLine(int pid, float x1, float y1, float x2, float y2,
                             float w, String color) 
     {
@@ -291,7 +295,7 @@ public class Project implements DropTargetListener, ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if ("Delete".equals(e.getActionCommand())) {
-            deleteSelection();
+            deleteElement(selectedObject);
         } else if ("Color".equals(e.getActionCommand())) {
             Color pColor = JColorChooser.showDialog(getCanvas(),
                                  "Выберите цвет", Color.BLACK);

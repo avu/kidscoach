@@ -42,6 +42,10 @@ function delete_selection() {
     scn.deleteSelection();
 }
 
+function delete_element(id) {
+    scn.deleteElement(id);
+}
+
 function bind_target(tid, oid) {
     scn.bindTarget(tid,oid);
 }

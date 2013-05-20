@@ -128,6 +128,7 @@ function change_prim_text(id, txt) {
 }
 
 function setTargetForObject(sobj,p) {
+    if (sobj.type == gobj_type_target) return;
     var targ = scn.getTargetForObject(sobj.id);
     if (targ) {
         Project.getProject().changeTarget(targ.id, p.x, p.y);
@@ -154,7 +155,7 @@ function mouseDownScene(evt) {
              
     importPackage(Packages.kidscoach);
     if(mode == mode_edit && sobj && tool == tool_select && sobj.type != gobj_type_target)
-    {    
+    {   
         setTargetForObject(sobj,p);
     } else if (tool == tool_new_line) {
         scn.startNewLine(p);

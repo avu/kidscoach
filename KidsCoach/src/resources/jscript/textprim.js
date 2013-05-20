@@ -1,7 +1,8 @@
 var gobj_type_text = "text";
 
-function TextPrim (pid, x0, y0, str, size, color) {
-    SPrim.call(this, pid, gobj_type_text, x0, y0, [0, 0], ["text"], [str, size, color]);
+function TextPrim (pid, x0, y0, str, size, color, ffamily, fweight, fstyle) {
+    SPrim.call(this, pid, gobj_type_text, x0, y0, [0, 0], ["text"], 
+        [str, size, color, ffamily, fweight, fstyle]);
 }
 
 TextPrim.prototype = Object.create(SPrim.prototype);
@@ -15,6 +16,13 @@ TextPrim.prototype.createNode = function() {
     p.setAttributeNS(null,"y",this.coords[1]);
     p.setAttributeNS(null,"font-size",this.data[1]);
     p.setAttributeNS(null,"fill", this.data[2]);
+    p.setAttributeNS(null,"style", "font-family:" + this.data[3] + 
+                     "; font-weight:" + this.data[4] + 
+                     "; font-style:" + this.data[5]);
+             
+    p.setAttributeNS(null,"style", "font-family:" + this.data[3]);
+    p.setAttributeNS(null,"style", "font-family:" + this.data[3]);
+    
     var v = document.createTextNode(this.data[0]);
     p.appendChild(v);
     grp.appendChild(p);

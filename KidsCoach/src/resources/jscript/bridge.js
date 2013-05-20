@@ -4,6 +4,9 @@ var mode = mode_edit;
 var text_size = default_text_size;
 var line_width = default_line_width;
 var prim_color = default_prim_color;
+var font_family = default_font_family;
+var font_weight = default_font_weight;
+var font_style = default_font_style;
     
 var tool_select = "select";
 var tool_delete = "delete";
@@ -107,8 +110,8 @@ function create_path(id, str, c) {
     scn.createPath(id, x, y, coords, c);
 }
 
-function create_text(id, x, y, str, s, c) {
-    scn.createText(id, x, y, str, s, c);
+function create_text(id, x, y, str, s, c, ff, fw, fs) {
+    scn.createText(id, x, y, str, s, c, ff, fw, fs);
 }
 
 function set_text_size(size) {

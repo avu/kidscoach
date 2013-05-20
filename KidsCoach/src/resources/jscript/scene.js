@@ -74,8 +74,8 @@ Scene.prototype.createPath = function (pid, x, y, coords, color) {
     this.oarr.push(p);
 };
 
-Scene.prototype.createText = function (pid, x, y, str, s, c) {
-    var p = new TextPrim(pid, x, y, str, s, c);
+Scene.prototype.createText = function (pid, x, y, str, s, c, ff, fw, fs) {
+    var p = new TextPrim(pid, x, y, str, s, c, ff, fw, fs);
     p.createNode();
     this.oarr.push(p);    
 };
@@ -573,7 +573,8 @@ Scene.prototype.startNewText = function (p) {
     this.toolStartX = p.x;
     this.toolStartY = p.y;
     this.constrPrim = new TextPrim(0, this.toolStartX, this.toolStartY, 
-                                   "", text_size, prim_color);
+                                   "", text_size, prim_color, font_family, 
+                                   font_weight, font_style);
     this.constrPrim.editMode = true;
     this.constrPrim.createNode();
     show_status("Нажмите ENTER для создания или ESC для отмены");
@@ -589,7 +590,9 @@ Scene.prototype.endNewText = function () {
     importPackage(Packages.kidscoach);
     var lid = Project.getProject().createNewText(
         this.toolStartX, this.toolStartY, this.constrPrim.data[0], 
-        this.constrPrim.data[1], this.constrPrim.data[2]);
+        this.constrPrim.data[1], this.constrPrim.data[2], 
+        this.constrPrim.data[3], this.constrPrim.data[4],
+        this.constrPrim.data[5]);
                                                  
     this.constrPrim.id = lid;
                 

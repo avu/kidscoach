@@ -220,10 +220,13 @@ public class Project implements DropTargetListener, ActionListener {
     }
 
     private void createText(int pid, float x, float y, String txt, String size, 
-                            String color) 
+                            String color, String fontFamily, String fontWeight,
+                            String fontStyle) 
     {
         canvas.executeScript("create_text(" + pid + "," + x + "," + y +
-                             ",\"" + txt + "\",\""  + size +  "\",\"" + color + "\")");
+                             ",\"" + txt + "\",\""  + size +  "\",\"" + color + 
+                             "\",\"" + fontFamily + "\",\"" + fontWeight + 
+                             "\",\"" + fontStyle + "\")");
     }
 
     public void showEditTextDlg() {
@@ -664,7 +667,10 @@ public class Project implements DropTargetListener, ActionListener {
                                 final String text = pobj.getAttribute("text");
                                 final String s = pobj.getAttribute("size");                                
                                 String c = pobj.getAttribute("color");
-                                createText(pid, x, y, text, s, c);
+                                final String ff = pobj.getAttribute("font-family");
+                                final String fw = pobj.getAttribute("font-weight");
+                                final String fs = pobj.getAttribute("font-style");
+                                createText(pid, x, y, text, s, c, ff, fw, fs);
                             } else if (pobj.getTagName().equals("object")) {
                                 final int id = 
                                     Integer.parseInt(pobj.getAttribute("id"));
@@ -1493,7 +1499,9 @@ public class Project implements DropTargetListener, ActionListener {
       return res; 
    }
 
-   public int createNewText(float x, float y, String str, String s, String color) {
+   public int createNewText(float x, float y, String str, String s, 
+                            String color, String ff, String fw, String fs) 
+   {
        Element slide = getSlide(curSlideId);
 
        for (Node obj = slide.getFirstChild(); obj != null; 
@@ -1509,6 +1517,9 @@ public class Project implements DropTargetListener, ActionListener {
                   sobj.setAttribute("text", str);
                   sobj.setAttribute("size", s);
                   sobj.setAttribute("color", color);
+                  sobj.setAttribute("font-family", ff);
+                  sobj.setAttribute("font-weight", fw);
+                  sobj.setAttribute("font-style", fs);
 
                   objsEl.appendChild(sobj);
               }

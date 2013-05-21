@@ -168,6 +168,10 @@ public class Project implements DropTargetListener, ActionListener {
     void changeTextSize(String size) {
         canvas.executeScript("set_text_size(\"" + size + "\")");
     }
+    
+    void changeFontFamily(String ff) {
+        canvas.executeScript("set_font_family(\"" + ff + "\")");
+    }
 
     void changeLineWidth(String size) {
         canvas.executeScript("set_line_width(\"" + size + "\")");

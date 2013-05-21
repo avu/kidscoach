@@ -17,6 +17,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -191,6 +192,9 @@ public class KidsCoach extends JFrame implements ActionListener {
                 
                 prj.changeColor("#" + Integer.toHexString(pColor.getRGB()).substring(2));
             }
+        } else if ("FontFamily".equals(e.getActionCommand())) {
+            JComboBox<String> cb = (JComboBox<String>)e.getSource();
+            prj.changeFontFamily((String)cb.getSelectedItem());
         }
     }
 
@@ -273,14 +277,15 @@ public class KidsCoach extends JFrame implements ActionListener {
         
         primBar = new ToolBar(this, new String[][] {
             {"NewLine", "s32/draw_line.png", "Отрезок"},
-            {"WidthLabel", "", "Ширина", ToolBar.LABEL},            
+            //{"WidthLabel", "", "Ширина", ToolBar.LABEL},            
             {"ChangeLineWidth", "1", "Ширина", ToolBar.TEXT_FIELD_INT},
             {"NewEllipse", "s32/ellipse.png", "Эллипс"},
             {"NewRectangle", "s32/draw_rectangle.png", "Прямоугольник"},
             {"NewCurvedPath", "s32/curved_path.png", "Путь"},
             {"ChangeColor", "s32/draw_rectangle.png", "Цвет", ToolBar.COLOR},            
             {"NewText", "s32/draw_text.png", "Текст"},
-            {"TextSizeLabel", "", "Шрифт", ToolBar.LABEL},
+            //{"TextSizeLabel", "", "Шрифт", ToolBar.LABEL},
+            {"FontFamily", "font-family", "", ToolBar.LIST},            
             {"ChangeTextSize", "100", "Шрифт", ToolBar.TEXT_FIELD_INT},
         });
         

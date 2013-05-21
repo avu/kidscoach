@@ -4,6 +4,7 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +21,7 @@ public class ToolBar extends JToolBar {
     static final int DT_ACTION_CMD = 0;
     static final int DT_IMAGE_NAME = 1;
     static final int DT_INPUT_TEXT = 1;
+    static final int DT_COMBO_ITEM = 1;    
     static final int DT_TOOLTIP_TEXT = 2;
     static final int DT_LABEL_TEXT = 2;
     static final int DT_CTRL_TYPE = 3;
@@ -28,6 +30,7 @@ public class ToolBar extends JToolBar {
     public static final String TEXT_FIELD_INT = "text_field_int";
     public static final String LABEL = "label";
     public static final String COLOR = "color";
+    public static final String LIST = "list";
     
     private class ActionFocusListener implements FocusListener {
         ActionListener actionListener;
@@ -94,6 +97,26 @@ public class ToolBar extends JToolBar {
                 button.addActionListener(actionListener);
                 map.put(btns[i][DT_ACTION_CMD], button);
                 add(button);
+            } else if (LIST.equals(btns[i][DT_CTRL_TYPE])) {
+                JComboBox<String> cb = new JComboBox<String>();
+                if ("font-family".equals(btns[i][DT_COMBO_ITEM])) {
+                    GraphicsEnvironment ge = 
+                        GraphicsEnvironment.getLocalGraphicsEnvironment();
+                    
+                    String []fontFamilies = ge.getAvailableFontFamilyNames();
+                    int curFontFamily = 0;
+                    for (int j = 0; j < fontFamilies.length; j++) {
+                        cb.addItem(fontFamilies[j]);
+                        if ("times".equalsIgnoreCase(fontFamilies[j])) {
+                            curFontFamily = j;
+                        }
+                    }
+                    cb.setSelectedIndex(curFontFamily);
+                }
+                cb.setToolTipText(btns[i][DT_TOOLTIP_TEXT]);
+                cb.setActionCommand(btns[i][DT_ACTION_CMD]);
+                cb.addActionListener(actionListener);
+                add(cb);
             }
         }
     }

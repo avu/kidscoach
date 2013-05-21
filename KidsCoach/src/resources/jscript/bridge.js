@@ -122,6 +122,9 @@ function set_line_width(size) {
     line_width = size;    
 }
 
+function set_font_family(ff) {
+    font_family = ff;
+}
 function change_color(c) {
     prim_color= c;
 }

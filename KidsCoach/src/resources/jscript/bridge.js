@@ -133,8 +133,8 @@ function change_prim_color(id, c) {
     scn.changePrimColor(id, c);    
 }
 
-function change_prim_text(id, txt) {
-    return scn.changePrimText(id, txt);
+function change_prim_text_family_weight_style(id, txt, ff, fw, fs) {
+    return scn.changePrimTextFamilyWeightStyle(id, txt, ff, fw, fs);
 }
 
 function setTargetForObject(sobj,p) {

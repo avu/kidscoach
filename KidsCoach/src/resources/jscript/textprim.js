@@ -19,10 +19,7 @@ TextPrim.prototype.createNode = function() {
     p.setAttributeNS(null,"style", "font-family:" + this.data[3] + 
                      "; font-weight:" + this.data[4] + 
                      "; font-style:" + this.data[5]);
-             
-    p.setAttributeNS(null,"style", "font-family:" + this.data[3]);
-    p.setAttributeNS(null,"style", "font-family:" + this.data[3]);
-    
+                 
     var v = document.createTextNode(this.data[0]);
     p.appendChild(v);
     grp.appendChild(p);
@@ -113,6 +110,41 @@ TextPrim.prototype.setText = function(txt) {
     }
 };
 
-TextPrim.prototype.getText = function(txt) {
+TextPrim.prototype.getText = function() {
     return this.data[0];
+};
+TextPrim.prototype.setTextFamilyWeightSyle = function(txt, ff, fw, fs) {
+    this.data[0] = txt;
+    this.data[3] = ff;
+    this.data[4] = fw;
+    this.data[5] = fs;
+    if (this.node) {
+        var list = this.node.getElementsByTagName("text");
+        var p = list.item(0);
+        this.node.removeChild(p);
+        p = document.createElementNS(svgNS, "text");
+        p.setAttributeNS(null,"x",this.coords[0]);
+        p.setAttributeNS(null,"y",this.coords[1]);
+        p.setAttributeNS(null,"font-size",this.data[1]);
+        p.setAttributeNS(null,"fill", this.data[2]);
+        p.setAttributeNS(null,"style", "font-family:" + this.data[3] + 
+                     "; font-weight:" + this.data[4] + 
+                     "; font-style:" + this.data[5]);
+                 
+        var v = document.createTextNode(this.data[0]);
+        p.appendChild(v);
+        this.node.appendChild(p);
+    }
+};
+
+TextPrim.prototype.getFontFamily = function() {
+    return this.data[3];
+};
+
+TextPrim.prototype.getFontWeight = function() {
+    return this.data[4];
+};
+
+TextPrim.prototype.getFontStyle = function() {
+    return this.data[5];
 };

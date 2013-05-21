@@ -172,10 +172,10 @@ Scene.prototype.changePrimColor = function(id, c) {
     }
 };
 
-Scene.prototype.changePrimText = function(id, txt) {
+Scene.prototype.changePrimTextFamilyWeightStyle = function(id, txt, ff, fw, fs) {
     for (var i = 0; i < this.oarr.length; i++) {
         if (this.oarr[i].id == id) {
-            this.oarr[i].setText(txt);
+            this.oarr[i].setTextFamilyWeightSyle(txt, ff, fw, fs);
         }
     }
 };
@@ -184,6 +184,31 @@ Scene.prototype.getPrimText = function(id) {
     for (var i = 0; i < this.oarr.length; i++) {
         if (this.oarr[i].id == id) {
             return this.oarr[i].getText();
+        }
+    }
+    return "";
+};
+
+Scene.prototype.getPrimFontFamily = function(id) {
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].id == id) {
+            return this.oarr[i].getFontFamily();
+        }
+    }
+    return "";
+};
+Scene.prototype.getPrimFontWeight = function(id) {
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].id == id) {
+            return this.oarr[i].getFontWeight();
+        }
+    }
+    return "";
+};
+Scene.prototype.getPrimFontStyle = function(id) {
+    for (var i = 0; i < this.oarr.length; i++) {
+        if (this.oarr[i].id == id) {
+            return this.oarr[i].getFontStyle();
         }
     }
     return "";

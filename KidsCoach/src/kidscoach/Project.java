@@ -46,6 +46,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -185,8 +186,11 @@ public class Project implements DropTargetListener, ActionListener {
         canvas.executeScript("change_prim_color(" + pid + ", \"" + rgb + "\")");        
     }
     
-    void changePrimText(String pid, String txt) {
-        canvas.executeScript("change_prim_text(" + pid + ", \"" + txt + "\")");        
+    void changePrimTextFamilyWeightStyle(String pid, String txt, String ff, 
+            String fw, String fs) 
+    {
+        canvas.executeScript("change_prim_text_family_weight_style(" + pid + 
+                ", \"" + txt + "\", \"" + ff + "\", \"" + fw + "\", \"" + fs + "\")");        
     }    
 
 
@@ -240,6 +244,7 @@ public class Project implements DropTargetListener, ActionListener {
         
         GridBagConstraints constr = new GridBagConstraints();
         final JTextField fld = new JTextField();
+        fld.setHorizontalAlignment(JTextField.CENTER);
         fld.setText(getPrimText(Integer.toString(selectedObject)));
         constr.weightx = 100;
         constr.weighty = 100;
@@ -253,18 +258,144 @@ public class Project implements DropTargetListener, ActionListener {
         editDlg.add(fld, constr);
 
         constr = new GridBagConstraints();
-        final JButton okBtn = new JButton("Изменить");
-        constr.weightx = 100;
+        JLabel l = new JLabel("Шрифт");
+        constr.weightx = 0;
         constr.weighty = 0;
         constr.gridx = 0;
         constr.gridy = 1;
         constr.gridwidth = 1;
         constr.gridheight = 1;
         constr.insets = new Insets(0, 20, 20, 20);
+        constr.anchor = GridBagConstraints.WEST;
+        editDlg.add(l, constr);
+
+        constr = new GridBagConstraints();
+        final JComboBox<String> fontFamily = new JComboBox<String>();
+        constr.weightx = 0;
+        constr.weighty = 0;
+        constr.gridx = 1;
+        constr.gridy = 1;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+        constr.anchor = GridBagConstraints.EAST;
+        
+        GraphicsEnvironment ge = 
+            GraphicsEnvironment.getLocalGraphicsEnvironment();
+                    
+        String []fontFamilies = ge.getAvailableFontFamilyNames();
+        int curFontFamily = 0;
+        String cFont = getPrimFontFamily(Integer.toString(selectedObject));
+        for (int j = 0; j < fontFamilies.length; j++) {
+            fontFamily.addItem(fontFamilies[j]);
+            if (cFont.equalsIgnoreCase(fontFamilies[j])) {
+                curFontFamily = j;
+            }
+        }
+        
+        fontFamily.setSelectedIndex(curFontFamily);
+                    
+        editDlg.add(fontFamily, constr);
+
+        constr = new GridBagConstraints();
+                
+        l = new JLabel("Толщина");
+        constr.weightx = 0;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 2;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+        constr.anchor = GridBagConstraints.WEST;
+
+        editDlg.add(l, constr);
+
+        
+        constr = new GridBagConstraints();
+        final JComboBox<String> fontWeight = new JComboBox<String>();
+        constr.weightx = 0;
+        constr.weighty = 0;
+        constr.gridx = 1;
+        constr.gridy = 2;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+        constr.anchor = GridBagConstraints.EAST;
+
+        fontWeight.addItem("normal");
+        fontWeight.addItem("lighter");
+        fontWeight.addItem("bold");
+        fontWeight.addItem("bolder");
+
+        int curFontWeight = 0;
+        String cWeight = getPrimFontWeight(Integer.toString(selectedObject));
+        for (int j = 0; j < fontWeight.getItemCount(); j++) {
+            if (cWeight.equalsIgnoreCase(fontWeight.getItemAt(j))) {
+                curFontWeight = j;
+            }
+        }
+        fontWeight.setSelectedIndex(curFontWeight);
+
+        editDlg.add(fontWeight, constr);
+
+        l = new JLabel("Стиль");
+        constr.weightx = 0;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 3;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+        constr.anchor = GridBagConstraints.WEST;
+
+        editDlg.add(l, constr);
+        
+        constr = new GridBagConstraints();
+        final JComboBox<String> fontStyle = new JComboBox<String>();
+        constr.weightx = 0;
+        constr.weighty = 0;
+        constr.gridx = 1;
+        constr.gridy = 3;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+        constr.anchor = GridBagConstraints.EAST;
+
+        fontStyle.addItem("normal");
+        fontStyle.addItem("italic");
+        fontStyle.addItem("oblique");
+        
+        int curFontStyle = 0;
+        String cStyle = getPrimFontStyle(Integer.toString(selectedObject));
+        for (int j = 0; j < fontStyle.getItemCount(); j++) {
+            if (cStyle.equalsIgnoreCase(fontStyle.getItemAt(j))) {
+                curFontStyle = j;
+            }
+        }
+        fontStyle.setSelectedIndex(curFontStyle);
+        editDlg.add(fontStyle, constr);
+
+        constr = new GridBagConstraints();
+        final JButton okBtn = new JButton("Изменить");
+        constr.weightx = 0;
+        constr.weighty = 0;
+        constr.gridx = 0;
+        constr.gridy = 4;
+        constr.gridwidth = 1;
+        constr.gridheight = 1;
+        constr.insets = new Insets(0, 20, 20, 20);
+        constr.anchor = GridBagConstraints.WEST;
         
         okBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                changePrimText(Integer.toString(selectedObject), fld.getText());
+                changePrimTextFamilyWeightStyle(
+                        selectedObject, 
+                        fld.getText(), 
+                        (String)fontFamily.getSelectedItem(),
+                        (String)fontWeight.getSelectedItem(),
+                        (String)fontStyle.getSelectedItem());
+                
                 editDlg.setVisible(false);
                 editDlg.dispose();
             }
@@ -275,12 +406,13 @@ public class Project implements DropTargetListener, ActionListener {
 
         constr = new GridBagConstraints();
         JButton cancelBtn = new JButton("Отмена");
-        constr.weightx = 100;
+        constr.weightx = 0;
         constr.weighty = 0;
         constr.gridx = 1;
-        constr.gridy = 1;
+        constr.gridy = 4;
         constr.gridwidth = 1;
         constr.gridheight = 1;
+        constr.anchor = GridBagConstraints.EAST;
         constr.insets = new Insets(0, 20, 20, 20);
 
 
@@ -295,7 +427,7 @@ public class Project implements DropTargetListener, ActionListener {
 
         editDlg.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         editDlg.setTitle("Изменение текста");
-        editDlg.setPreferredSize(new Dimension(320, 180));
+        editDlg.setPreferredSize(new Dimension(480, 320));
         editDlg.pack();
         editDlg.setVisible(true);
     }
@@ -1698,6 +1830,36 @@ public class Project implements DropTargetListener, ActionListener {
            return gobj.getAttribute("text");
        }
        return null;
+   }
+   
+   String getPrimFontFamily(String pid) {
+       Element slide = getSlide(curSlideId);
+       Element objects = lookupElement(slide, "objects");
+       if (objects != null) {
+           Element gobj = lookupElement(objects, "text", pid);
+           return gobj.getAttribute("font-family");
+       }
+       return null;
+   }    
+
+   String getPrimFontWeight(String pid) {
+       Element slide = getSlide(curSlideId);
+       Element objects = lookupElement(slide, "objects");
+       if (objects != null) {
+           Element gobj = lookupElement(objects, "text", pid);
+           return gobj.getAttribute("font-weight");
+       }
+       return null;
+   }    
+
+   String getPrimFontStyle(String pid) {
+       Element slide = getSlide(curSlideId);
+       Element objects = lookupElement(slide, "objects");
+       if (objects != null) {
+           Element gobj = lookupElement(objects, "text", pid);
+           return gobj.getAttribute("font-style");
+       }
+       return null;
    }    
 
    public int changeLine(String id, float x0, float y0, float x1, float y1, 
@@ -1804,6 +1966,24 @@ public class Project implements DropTargetListener, ActionListener {
                 String color = "#" + Integer.toHexString(col.getRGB()).substring(2);
                 e.setAttribute("color", color);
                 changePrimColor(id, color);
+            }
+        }
+    }
+   
+   void changePrimTextFamilyWeightStyle(int pid, String txt, String ff, 
+            String fw, String fs) 
+    {
+        Element slide = getSlide(curSlideId);
+      
+        Element objs = lookupElement(slide, "objects");
+        if (objs != null) {
+            Element e = lookupElement(objs, pid);
+            if (e != null) {
+                e.setAttribute("text", txt);
+                e.setAttribute("font-family", ff);
+                e.setAttribute("font-weight", fw);
+                e.setAttribute("font-style", fs);                
+                changePrimTextFamilyWeightStyle(Integer.toString(pid), txt, ff, fw, fs);
             }
         }
     }

@@ -3,6 +3,7 @@ package kidscoach;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
@@ -137,6 +138,7 @@ public class Project implements DropTargetListener, ActionListener {
     JLabel getStatusLine() {
         if (statusLine == null) {
             statusLine = new JLabel(" ");
+            statusLine.setFont(new Font("TimesRoman", Font.PLAIN, 14));
         }
         return statusLine;
     }

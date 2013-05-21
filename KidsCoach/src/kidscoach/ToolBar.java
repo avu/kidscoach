@@ -107,7 +107,7 @@ public class ToolBar extends JToolBar {
                     int curFontFamily = 0;
                     for (int j = 0; j < fontFamilies.length; j++) {
                         cb.addItem(fontFamilies[j]);
-                        if ("times".equalsIgnoreCase(fontFamilies[j])) {
+                        if ("arial".equalsIgnoreCase(fontFamilies[j])) {
                             curFontFamily = j;
                         }
                     }
